@@ -8,6 +8,6 @@ namespace TeamCalendarEventBot.Models
     public class Person
     {
         public int ChatId { get; set; }
-        public Permission Permission { get; set; }
+        public int Permissions { get; set; }
     }
 }
