@@ -20,7 +20,7 @@ namespace TeamCalendarEventBot.DataStorage.DataJsonFile
         #endregion
 
         #region Protected Methods
-        protected string GetFullPath(string fileName) => $"{_directoryPath}\\{fileName}";
+        private string GetFullPath(string fileName) => $"{_directoryPath}\\{fileName}";
         #endregion
 
         #region Public Methods

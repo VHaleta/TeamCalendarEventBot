@@ -14,6 +14,6 @@ namespace TeamCalendarEventBot.Models
 
         public Guid Id { get; }
         public MenuStage MenuStage { get; set; }
-        public Person User { get; }
+        public UserBot User { get; }
     }
 }

@@ -2,7 +2,7 @@
 {
     public interface IFileProvider
     {
-        string ReadFile(string path);
+        string ReadFile(string fileName);
         bool WriteFile(string path, string text);
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
-using TeamCalendarEventBot.DataStorage.DataModel;
+using TeamCalendarEventBot.Models;
 
 namespace TeamCalendarEventBot.DataStorage.DataJsonFile
 {
@@ -18,37 +18,34 @@ namespace TeamCalendarEventBot.DataStorage.DataJsonFile
         #endregion
 
         #region Public Methods
-        public List<UserInfo> GetAllUsers()
+        public List<UserBot> GetAllUsers()
         {
             var dataContents = FileProvider.ReadFile(_fileName);
             if (string.IsNullOrWhiteSpace(dataContents))
             {
-                return new List<UserInfo>();
+                return new List<UserBot>();
             }
 
-            return JsonConvert.DeserializeObject<List<UserInfo>>(dataContents);
+            return JsonConvert.DeserializeObject<List<UserBot>>(dataContents);
         }
 
-        public UserInfo GetUserInfoById(int userId) => GetAllUsers().FirstOrDefault(x => x.UserId == userId);
+        public UserBot GetUserInfoById(int chatId) => GetAllUsers().FirstOrDefault(x => x.ChatId == chatId);
 
-        public void UpsertUser(UserInfo userInfo)
+        public void UpsertUser(UserBot userBot)
         {
             var all = GetAllUsers();
 
-            var exist = all.FirstOrDefault(x => x.UserId == userInfo.UserId);
+            var exist = all.FirstOrDefault(x => x.UserId == userBot.UserId);
             if (exist != null)
             {
                 all.Remove(exist);
             }
-            all.Add(userInfo);
+            all.Add(userBot);
 
-            var newDataContents = JsonConvert.SerializeObject(all.OrderBy(x => x.UserId).ToList());
-            SaveData(newDataContents);
+            all = all.OrderBy(x => x.UserId).ToList();
+            var newDataContents = JsonConvert.SerializeObject(all);
+            FileProvider.WriteFile(_fileName, newDataContents);
         }
-        #endregion
-
-        #region Private Methods
-        private void SaveData(string contents) => FileProvider.WriteFile(_fileName, contents);
         #endregion
     }
 }
