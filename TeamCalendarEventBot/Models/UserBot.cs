@@ -8,7 +8,7 @@ namespace TeamCalendarEventBot.Models
 {
     public class UserBot
     {
-        public int ChatId { get; set; }
+        public long ChatId { get; set; }
         public string UserId { get; set; }
         public int Permissions { get; set; }
         public bool Active { get; set; }

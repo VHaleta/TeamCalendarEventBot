@@ -2,6 +2,9 @@
 using TeamCalendarEventBot.DataStorage;
 using TeamCalendarEventBot.DataStorage.DataJsonFile;
 using TeamCalendarEventBot.Models;
+using Telegram.Bot;
+using TeamCalendarEventBot.Constants;
+using TeamCalendarEventBot.Sevices;
 
 namespace TeamCalendarEventBot
 {
@@ -9,10 +12,10 @@ namespace TeamCalendarEventBot
     {
         static void Main(string[] args)
         {
-            IDataClient dataClient = new JsonFileDataClient();
+            TelegramBotClient client = new TelegramBotClient(TelegramBotInfo.token);
 
-            var allUser = dataClient.UserInfoDataProvider.GetAllUsers();
-
+            Updates updates = new Updates(client);
+            updates.ProcessUpdates();
 
             Console.ReadLine();
         }
