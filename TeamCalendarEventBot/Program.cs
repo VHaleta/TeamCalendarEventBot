@@ -1,23 +1,39 @@
 ﻿using System;
-using TeamCalendarEventBot.DataStorage;
-using TeamCalendarEventBot.DataStorage.DataJsonFile;
-using TeamCalendarEventBot.Models;
-using Telegram.Bot;
+using System.Threading;
+using System.Threading.Tasks;
 using TeamCalendarEventBot.Constants;
-using TeamCalendarEventBot.Sevices;
+using TeamCalendarEventBot.Services;
+using Telegram.Bot;
+using Telegram.Bot.Extensions.Polling;
+using Telegram.Bot.Types;
 
 namespace TeamCalendarEventBot
 {
-    internal class Program
+    public static class Program
     {
-        static void Main(string[] args)
+        private static TelegramBotClient Bot;
+
+        public static async Task Main()
         {
-            TelegramBotClient client = new TelegramBotClient(TelegramBotInfo.token);
+            Bot = new TelegramBotClient(TelegramBotInfo.Token);
 
-            Updates updates = new Updates(client);
-            updates.ProcessUpdates();
+            User me = await Bot.GetMeAsync();
+            Console.Title = me.Username ?? "My awesome Bot";
 
+            using var cts = new CancellationTokenSource();
+
+            // StartReceiving does not block the caller thread. Receiving is done on the ThreadPool.
+            ReceiverOptions receiverOptions = new() { AllowedUpdates = { } };
+            Bot.StartReceiving(BotProcessor.HandleUpdateAsync,
+                               BotProcessor.HandleErrorAsync,
+                               receiverOptions,
+                               cts.Token);
+
+            Console.WriteLine($"Start listening for @{me.Username}");
             Console.ReadLine();
+
+            // Send cancellation request to stop bot
+            cts.Cancel();
         }
     }
 }

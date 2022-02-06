@@ -35,7 +35,7 @@ namespace TeamCalendarEventBot.DataStorage.DataJsonFile
         {
             var all = GetAllUsers();
 
-            var exist = all.FirstOrDefault(x => x.UserId == userBot.UserId);
+            var exist = all.FirstOrDefault(x => x.ChatId == userBot.ChatId);
             if (exist != null)
             {
                 all.Remove(exist);
