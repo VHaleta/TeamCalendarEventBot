@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TeamCalendarEventBot.Constant
+namespace TeamCalendarEventBot.Constants
 {
     [Flags]
     public enum Permission

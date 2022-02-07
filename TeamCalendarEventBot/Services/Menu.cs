@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TeamCalendarEventBot.Constants;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace TeamCalendarEventBot.Constant
+namespace TeamCalendarEventBot.Services
 {
     public static class Menu
     {
@@ -26,17 +27,18 @@ namespace TeamCalendarEventBot.Constant
             return keyboard;
         }
 
+        public static ReplyKeyboardMarkup NoneAuthKeybord()
+        {
+            return new ReplyKeyboardMarkup(new KeyboardButton(MessageConst.JoinToBot));
+        }
+
         private static List<List<KeyboardButton>> GetCalendarMenuButtons(Permission permission)
         {
             List<List<KeyboardButton>> buttons = new List<List<KeyboardButton>>();
 
-            if ((permission & Permission.Unknown) == Permission.Unknown)
-                buttons.Add(new List<KeyboardButton> { new KeyboardButton("Регистрация") });
-
             if ((permission & Permission.View) == Permission.View)
             {
-                buttons.Add(new List<KeyboardButton> { new KeyboardButton("События на сегодня") });
-                buttons.Add(new List<KeyboardButton> { new KeyboardButton("События на завтра") });
+                buttons.Add(new List<KeyboardButton> { new KeyboardButton("События на сегодня"), new KeyboardButton("События на завтра")});
                 buttons.Add(new List<KeyboardButton> { new KeyboardButton("События на неделю") });
             }
 
@@ -51,9 +53,6 @@ namespace TeamCalendarEventBot.Constant
         private static List<List<KeyboardButton>> GetMainMenuButtons(Permission permission)
         {
             List<List<KeyboardButton>> buttons = new List<List<KeyboardButton>>();
-
-            if ((permission & Permission.Unknown) == Permission.Unknown)
-                buttons.Add(new List<KeyboardButton> { new KeyboardButton("Регистрация") });
 
             if ((permission & Permission.View) == Permission.View)
                 buttons.Add(new List<KeyboardButton> { new KeyboardButton("Календарь") });

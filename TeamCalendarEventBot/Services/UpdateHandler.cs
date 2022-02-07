@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
+using TeamCalendarEventBot.Constants;
 using TeamCalendarEventBot.Models;
+using TeamCalendarEventBot.Services;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -19,58 +21,38 @@ namespace TeamCalendarEventBot.Sevices
             Console.WriteLine($"Receive message type: {message.Type}");
             if (message.Type != MessageType.Text)
                 return;
+            if (!await UserHandler.IsUserAuthorizedAsync(botClient, message, user)) return;
 
-            var action = message.Text! switch
+                var action = message.Text! switch
             {
                 //"/inline" => SendInlineKeyboard(botClient, message),
                 //"/keyboard" => SendReplyKeyboard(botClient, message),
                 //"/remove" => RemoveKeyboard(botClient, message),
                 //"/photo" => SendFile(botClient, message),
                 //"/request" => RequestContactAndLocation(botClient, message),
-                _ => UnknownMessageAsync(botClient, message)
+                "/start" => StartupMessageAsync(botClient, message, user),
+                "Вернуться в главное меню" => StartupMessageAsync(botClient, message, user),
+                "Календарь" => CalendarMessageAsync(botClient, message, user),
+                _ => UnknownMessageAsync(botClient, message, user)
             };
             Message sentMessage = await action;
             Console.WriteLine($"The message was sent with id: {sentMessage.MessageId}");
 
         }
-        private static async Task<Message> UnknownMessageAsync(ITelegramBotClient botClient, Message message)
+
+        private static async Task<Message> CalendarMessageAsync(ITelegramBotClient botClient, Message message, UserBot user)
         {
-            return await botClient.SendTextMessageAsync(chatId: message.Chat.Id, text: "Unknown Message");
+            return await botClient.SendTextMessageAsync(chatId: user.ChatId, "Выберите действие", replyMarkup: Menu.GetMenuButtons((Permission)user.Permissions, MenuStage.CalendarMenu));
         }
 
+        private static async Task<Message> StartupMessageAsync(ITelegramBotClient botClient, Message message, UserBot user)
+        {
+            return await botClient.SendTextMessageAsync(chatId: user.ChatId, "Выберите действие", replyMarkup: Menu.GetMenuButtons((Permission)user.Permissions, MenuStage.MainMenu));
+        }
 
-        //private TelegramBotClient client;
-        //IDataClient dataClient;
-        //List<UserBot> allUsers;
-        //public UpdateHandler(TelegramBotClient client)
-        //{
-        //    this.client = client;
-        //    dataClient = new JsonFileDataClient();
-        //    allUsers = dataClient.UserInfoDataProvider.GetAllUsers();
-        //}
-        //public void ProcessUpdates()
-        //{
-        //    int offset = 0;
-        //    while (true)
-        //    {
-        //        var updates = client.GetUpdatesAsync(offset).Result;
-        //        if (updates != null && updates.Count() > 0)
-        //        {
-        //            allUsers = dataClient.UserInfoDataProvider.GetAllUsers();
-        //            foreach (var update in updates)
-        //            {
-        //                ProcessUpdate(update);
-        //                offset = update.Id + 1;
-        //            }
-        //        }
-        //        Thread.Sleep(500);
-        //    }
-        //}
-
-        //private void ProcessUpdate(Update update)
-        //{
-        //    UserBot userBot = UserCheck(update);
-        //    client.SendTextMessageAsync(userBot.ChatId, "Меню", Menu.GetMenuButtons((Permission)userBot.Permissions, MenuStage.MainMenu));
-        //}
+        private static async Task<Message> UnknownMessageAsync(ITelegramBotClient botClient, Message message, UserBot user)
+        {
+            return await botClient.SendTextMessageAsync(chatId: user.ChatId, text: "Неизвестное сообщение\nДля начального меню введите команду /start");
+        }
     }
 }
