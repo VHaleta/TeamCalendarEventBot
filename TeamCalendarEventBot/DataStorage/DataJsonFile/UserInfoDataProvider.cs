@@ -9,6 +9,7 @@ namespace TeamCalendarEventBot.DataStorage.DataJsonFile
     {
         #region Fields
         private const string _fileName = "users.dat";
+        private static object _locker = new object();
         #endregion
 
         #region Constructors
@@ -20,31 +21,34 @@ namespace TeamCalendarEventBot.DataStorage.DataJsonFile
         #region Public Methods
         public List<UserBot> GetAllUsers()
         {
-            var dataContents = FileProvider.ReadFile(_fileName);
-            if (string.IsNullOrWhiteSpace(dataContents))
+            lock (_locker)
             {
-                return new List<UserBot>();
+                var dataContents = FileProvider.ReadFile(_fileName);
+                if (string.IsNullOrWhiteSpace(dataContents))
+                {
+                    return new List<UserBot>();
+                }
+
+                return JsonConvert.DeserializeObject<List<UserBot>>(dataContents);
             }
-
-            return JsonConvert.DeserializeObject<List<UserBot>>(dataContents);
         }
-
-        public UserBot GetUserInfoById(int chatId) => GetAllUsers().FirstOrDefault(x => x.ChatId == chatId);
 
         public void UpsertUser(UserBot userBot)
         {
-            var all = GetAllUsers();
-
-            var exist = all.FirstOrDefault(x => x.ChatId == userBot.ChatId);
-            if (exist != null)
+            lock (_locker)
             {
-                all.Remove(exist);
-            }
-            all.Add(userBot);
+                var all = GetAllUsers();
+                var exist = all.FirstOrDefault(x => x.ChatId == userBot.ChatId);
+                if (exist != null)
+                {
+                    all.Remove(exist);
+                }
+                all.Add(userBot);
 
-            all = all.OrderBy(x => x.UserId).ToList();
-            var newDataContents = JsonConvert.SerializeObject(all);
-            FileProvider.WriteFile(_fileName, newDataContents);
+                all = all.OrderBy(x => x.UserId).ToList();
+                var newDataContents = JsonConvert.SerializeObject(all);
+                FileProvider.WriteFile(_fileName, newDataContents);
+            }
         }
         #endregion
     }

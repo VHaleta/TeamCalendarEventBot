@@ -45,7 +45,7 @@ namespace TeamCalendarEventBot.Services
             if (((permission & Permission.OwnCalendar) == Permission.OwnCalendar) || ((permission & Permission.CommonCalendar) == Permission.CommonCalendar))
                 buttons.Add(new List<KeyboardButton> { new KeyboardButton("Редактировать события") });
 
-            buttons.Add(new List<KeyboardButton> { new KeyboardButton("Вернуться в главное меню") });
+            buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.BackToMainMenu) });
 
             return buttons;
         }
@@ -55,7 +55,7 @@ namespace TeamCalendarEventBot.Services
             List<List<KeyboardButton>> buttons = new List<List<KeyboardButton>>();
 
             if ((permission & Permission.View) == Permission.View)
-                buttons.Add(new List<KeyboardButton> { new KeyboardButton("Календарь") });
+                buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.Calendar) });
 
             if ((permission & Permission.OwnCalendar) == Permission.OwnCalendar)
                 buttons.Add(new List<KeyboardButton> { new KeyboardButton("Добавить событие(для себя)") });

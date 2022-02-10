@@ -19,11 +19,10 @@ namespace TeamCalendarEventBot.Sevices
         public static async Task BotOnMessageReceivedAsync(ITelegramBotClient botClient, Message message, UserBot user)
         {
             Console.WriteLine($"Receive message type: {message.Type}");
-            if (message.Type != MessageType.Text)
-                return;
+            if (message.Type != MessageType.Text) return;
             if (!await UserHandler.IsUserAuthorizedAsync(botClient, message, user)) return;
 
-                var action = message.Text! switch
+            var action = message.Text! switch
             {
                 //"/inline" => SendInlineKeyboard(botClient, message),
                 //"/keyboard" => SendReplyKeyboard(botClient, message),
@@ -31,13 +30,13 @@ namespace TeamCalendarEventBot.Sevices
                 //"/photo" => SendFile(botClient, message),
                 //"/request" => RequestContactAndLocation(botClient, message),
                 "/start" => StartupMessageAsync(botClient, message, user),
-                "Вернуться в главное меню" => StartupMessageAsync(botClient, message, user),
-                "Календарь" => CalendarMessageAsync(botClient, message, user),
+                MessageConst.BackToMainMenu => StartupMessageAsync(botClient, message, user),
+                MessageConst.Calendar => CalendarMessageAsync(botClient, message, user),
                 _ => UnknownMessageAsync(botClient, message, user)
             };
+
             Message sentMessage = await action;
             Console.WriteLine($"The message was sent with id: {sentMessage.MessageId}");
-
         }
 
         private static async Task<Message> CalendarMessageAsync(ITelegramBotClient botClient, Message message, UserBot user)

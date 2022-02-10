@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TeamCalendarEventBot.Constant;
-using TeamCalendarEventBot.Constants;
+﻿using TeamCalendarEventBot.Constants;
 
 namespace TeamCalendarEventBot.Models
 {
