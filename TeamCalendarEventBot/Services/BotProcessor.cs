@@ -29,13 +29,11 @@ namespace TeamCalendarEventBot.Services
         {
             var user = UserHandler.GetUser(update);
             if (!user.Active) return;
-
-            // TODO: Check Active -> Ignore
-            // TODO: Auth -> NONE -> Suggest to join ->  button
-            // TODO: Auth -> Requsted -> send message 
+            if (!UserHandler.IsUserAuthorizedAsync(botClient, update.Message, user).Result) return;
 
             var handler = update.Type switch
             {
+                // TODO: update types
                 // UpdateType.Unknown:
                 // UpdateType.ChannelPost:
                 // UpdateType.EditedChannelPost:
