@@ -41,6 +41,7 @@ namespace TeamCalendarEventBot.Sevices
 
         private static async Task<Message> CalendarMessageAsync(ITelegramBotClient botClient, Message message, UserBot user)
         {
+            await botClient.SendTextMessageAsync(user.ChatId, MessageConst.Calendar, replyMarkup: Calendar.GetCalendarKeyboard(DateTime.Today));
             return await botClient.SendTextMessageAsync(chatId: user.ChatId, "Выберите действие", replyMarkup: Menu.GetMenuButtons((Permission)user.Permissions, MenuStage.CalendarMenu));
         }
 
