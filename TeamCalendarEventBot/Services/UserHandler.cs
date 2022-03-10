@@ -52,19 +52,29 @@ namespace TeamCalendarEventBot.Services
 
         public static UserBot GetUser(Update update)
         {
-            long id = update.Type switch
+            long id;
+            string username;
+            switch (update.Type)
             {
-                UpdateType.Message => update.Message.Chat.Id,
-                UpdateType.CallbackQuery => update.CallbackQuery.Message.Chat.Id,
-                UpdateType.EditedMessage => update.EditedMessage.Chat.Id,
-                _ => 0
-            };
-
-            if (id == 0)
-            {
-                Console.WriteLine(update.Type + " is not handled");
+                case UpdateType.Message:
+                    id = update.Message.Chat.Id;
+                    username = update.Message.Chat.Username;
+                    break;
+                case UpdateType.CallbackQuery:
+                    id = update.CallbackQuery.Message.Chat.Id;
+                    username = update.CallbackQuery.Message.Chat.Username;
+                    break;
+                case UpdateType.EditedMessage:
+                    id = update.EditedMessage.Chat.Id;
+                    username = update.EditedMessage.Chat.Username;
+                    break;
+                default:
+                    Console.WriteLine(update.Type + " is not handled");
+                    id = 0;
+                    username = "unknown";
+                    break;
             }
-
+            
             var user = _allUsers.FirstOrDefault(x => x.ChatId == id);
             if (user != null) return user;
 
@@ -77,6 +87,7 @@ namespace TeamCalendarEventBot.Services
                 user = new UserBot
                 {
                     ChatId = id,
+                    Username = username,
                     Active = true,
                     Auth = AuthenticationState.None,
                     Permissions = 0

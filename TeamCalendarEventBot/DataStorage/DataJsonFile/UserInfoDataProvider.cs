@@ -45,7 +45,7 @@ namespace TeamCalendarEventBot.DataStorage.DataJsonFile
                 }
                 all.Add(userBot);
 
-                all = all.OrderBy(x => x.UserId).ToList();
+                all = all.OrderBy(x => x.Username).ToList();
                 var newDataContents = JsonConvert.SerializeObject(all);
                 FileProvider.WriteFile(_fileName, newDataContents);
             }
