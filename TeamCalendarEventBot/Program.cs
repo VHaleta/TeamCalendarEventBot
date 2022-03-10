@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using TeamCalendarEventBot.Constants;
@@ -15,6 +16,7 @@ namespace TeamCalendarEventBot
 
         public static async Task Main()
         {
+            Console.OutputEncoding = Encoding.UTF8;
             Bot = new TelegramBotClient(TelegramBotInfo.Token);
 
             User me = await Bot.GetMeAsync();

@@ -45,9 +45,8 @@ namespace TeamCalendarEventBot.Services
                 //UpdateType.ChosenInlineResult => BotOnChosenInlineResultReceived(botClient, update.ChosenInlineResult!),
 
                 UpdateType.Message => UpdateHandler.BotOnMessageReceivedAsync(botClient, update.Message, user),
-                //UpdateType.CallbackQuery => BotOnCallbackQueryReceived(botClient, update.CallbackQuery!),
+                UpdateType.CallbackQuery => UpdateHandler.BotOnCallbackQueryReceived(botClient, update.CallbackQuery, user),
                 _ => UpdateHandler.UnknownUpdateHandlerAsync(botClient, update)
-
             };
 
             try

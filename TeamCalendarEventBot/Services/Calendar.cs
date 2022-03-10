@@ -44,7 +44,7 @@ namespace TeamCalendarEventBot.Services
             string endCallback = "." + ((date.Month / 10 > 0) ? date.Month.ToString() : "0" + date.Month.ToString()) + "." + date.Year.ToString();
             List<List<InlineKeyboardButton>> keyboardButtons = new List<List<InlineKeyboardButton>>
                 {
-                    new List<InlineKeyboardButton>{ new InlineKeyboardButton("<") {CallbackData = "previous" }, new InlineKeyboardButton(MonthConverter.NumberToText(date.Month)) { CallbackData = "nothing" }, new InlineKeyboardButton(">") { CallbackData = "next" }},
+                    new List<InlineKeyboardButton>{ new InlineKeyboardButton("<") {CallbackData = "changeMonth " + date.Month }, new InlineKeyboardButton(MonthConverter.NumberToText(date.Month)) { CallbackData = "nothing" }, new InlineKeyboardButton(">") { CallbackData = "changeMonth " + date.Month } },
                     new List<InlineKeyboardButton>{new InlineKeyboardButton("ПН") { CallbackData = "nothing" }, new InlineKeyboardButton("ВТ") { CallbackData = "nothing" }, new InlineKeyboardButton("СР") { CallbackData = "nothing" }, new InlineKeyboardButton("ЧТ") { CallbackData = "nothing" }, new InlineKeyboardButton("ПТ") { CallbackData = "nothing" }, new InlineKeyboardButton("СБ") { CallbackData = "nothing" }, new InlineKeyboardButton("ВС") { CallbackData = "nothing" } } ,
                 };
             for (int i = 0; i < days.Count; i++)

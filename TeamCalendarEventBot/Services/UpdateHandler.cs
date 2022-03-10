@@ -18,9 +18,8 @@ namespace TeamCalendarEventBot.Sevices
         }
         public static async Task BotOnMessageReceivedAsync(ITelegramBotClient botClient, Message message, UserBot user)
         {
-            Console.WriteLine($"Receive message type: {message.Type}");
             if (message.Type != MessageType.Text) return;
-            if (!await UserHandler.IsUserAuthorizedAsync(botClient, message, user)) return;
+            Console.WriteLine($"Receive update type: Message: {message.Text}\nchat id: {user.ChatId} username: {user.Username}");
 
             var action = message.Text! switch
             {
@@ -36,13 +35,18 @@ namespace TeamCalendarEventBot.Sevices
             };
 
             Message sentMessage = await action;
-            Console.WriteLine($"The message was sent with id: {sentMessage.MessageId}");
         }
 
         private static async Task<Message> CalendarMessageAsync(ITelegramBotClient botClient, Message message, UserBot user)
         {
             await botClient.SendTextMessageAsync(user.ChatId, MessageConst.Calendar, replyMarkup: Calendar.GetCalendarKeyboard(DateTime.Today));
             return await botClient.SendTextMessageAsync(chatId: user.ChatId, "Выберите действие", replyMarkup: Menu.GetMenuButtons((Permission)user.Permissions, MenuStage.CalendarMenu));
+        }
+
+        public static async Task BotOnCallbackQueryReceived(ITelegramBotClient botClient, CallbackQuery callbackQuery, UserBot user)
+        {
+            Console.WriteLine($"Receive update type: CallbackQuery: {callbackQuery.Data}\nchat id: {user.ChatId} username: {user.Username}");
+
         }
 
         private static async Task<Message> StartupMessageAsync(ITelegramBotClient botClient, Message message, UserBot user)
