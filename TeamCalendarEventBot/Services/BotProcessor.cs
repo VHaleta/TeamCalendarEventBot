@@ -33,7 +33,7 @@ namespace TeamCalendarEventBot.Services
 
             var handler = update.Type switch
             {
-                // TODO: update types
+                // TODO: Add more processing update types
                 // UpdateType.Unknown:
                 // UpdateType.ChannelPost:
                 // UpdateType.EditedChannelPost:

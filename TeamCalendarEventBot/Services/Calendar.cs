@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TeamCalendarEventBot.Constants;
 using TeamCalendarEventBot.Helpers;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -10,7 +11,8 @@ namespace TeamCalendarEventBot.Services
 {
     static class Calendar
     {
-        public static IReplyMarkup GetCalendarKeyboard(DateTime date)
+        // TODO: Error if month starts in 1th box it gain empty line
+        public static InlineKeyboardMarkup GetCalendarKeyboard(DateTime date)
         {
             int firstDay = 1, day = 1, daysInMonth;
             List<List<string>> days = new List<List<string>>();
@@ -39,12 +41,12 @@ namespace TeamCalendarEventBot.Services
             return GetCalendar(days, date);
         }
 
-        static IReplyMarkup GetCalendar(List<List<string>> days, DateTime date)
+        static InlineKeyboardMarkup GetCalendar(List<List<string>> days, DateTime date)
         {
             string endCallback = "." + ((date.Month / 10 > 0) ? date.Month.ToString() : "0" + date.Month.ToString()) + "." + date.Year.ToString();
             List<List<InlineKeyboardButton>> keyboardButtons = new List<List<InlineKeyboardButton>>
                 {
-                    new List<InlineKeyboardButton>{ new InlineKeyboardButton("<") {CallbackData = "changeMonth " + date.Month }, new InlineKeyboardButton(MonthConverter.NumberToText(date.Month)) { CallbackData = "nothing" }, new InlineKeyboardButton(">") { CallbackData = "changeMonth " + date.Month } },
+                    new List<InlineKeyboardButton>{ new InlineKeyboardButton("<") {CallbackData = $"{CallbackConst.ChangeMonth} {date.Month - 1}"}, new InlineKeyboardButton(MonthConverter.NumberToText(date.Month)) { CallbackData = "nothing" }, new InlineKeyboardButton(">") { CallbackData = $"{CallbackConst.ChangeMonth} {date.Month + 1}" } },
                     new List<InlineKeyboardButton>{new InlineKeyboardButton("ПН") { CallbackData = "nothing" }, new InlineKeyboardButton("ВТ") { CallbackData = "nothing" }, new InlineKeyboardButton("СР") { CallbackData = "nothing" }, new InlineKeyboardButton("ЧТ") { CallbackData = "nothing" }, new InlineKeyboardButton("ПТ") { CallbackData = "nothing" }, new InlineKeyboardButton("СБ") { CallbackData = "nothing" }, new InlineKeyboardButton("ВС") { CallbackData = "nothing" } } ,
                 };
             for (int i = 0; i < days.Count; i++)
