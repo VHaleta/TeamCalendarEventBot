@@ -20,7 +20,7 @@ namespace TeamCalendarEventBot.Sevices
         public static async Task BotOnMessageReceivedAsync(ITelegramBotClient botClient, Message message, UserBot user)
         {
             if (message.Type != MessageType.Text) return;
-            Console.WriteLine($"Receive update type: Message: {message.Text}\nchat id: {user.ChatId} username: {user.Username}");
+            Console.WriteLine($"Receive update type: Message: {message.Text}\nchat id: {user.ChatId} username: {user.Username}\n----------------------------------------------------");
 
             var action = message.Text! switch
             {
@@ -39,7 +39,7 @@ namespace TeamCalendarEventBot.Sevices
         }
         public static async Task BotOnCallbackQueryReceived(ITelegramBotClient botClient, CallbackQuery callbackQuery, UserBot user)
         {
-            Console.WriteLine($"Receive update type: CallbackQuery: {callbackQuery.Data}\nchat id: {user.ChatId} username: {user.Username}");
+            Console.WriteLine($"Receive update type: CallbackQuery: {callbackQuery.Data}\nchat id: {user.ChatId} username: {user.Username}\n----------------------------------------------------");
             string data = callbackQuery.Data;
             DateTime date;
             if(!DateTime.TryParse(data, out date))
@@ -59,7 +59,7 @@ namespace TeamCalendarEventBot.Sevices
             }
             else
             {
-                Console.WriteLine("It was date: " + date.ToString());
+                await ShowCalendarEventsByDateAsync(botClient, date, user);
             }
         }
         #endregion
@@ -91,7 +91,10 @@ namespace TeamCalendarEventBot.Sevices
             DateTime date = new DateTime(DateTime.Today.Year, month, 1);
             await botClient.EditMessageReplyMarkupAsync(chatId: user.ChatId, callbackQuery.Message.MessageId, replyMarkup: Calendar.GetCalendarKeyboard(date));
         }
-
+        private static async Task ShowCalendarEventsByDateAsync(ITelegramBotClient botClient, DateTime date, UserBot user)
+        {
+            await Services.EventHandler.ShowCalendarEventsByDateAsync(botClient, date, user);
+        }
         #endregion
     }
 }

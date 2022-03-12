@@ -11,14 +11,14 @@ namespace TeamCalendarEventBot.Services
 {
     static class Calendar
     {
-        // TODO: Error if month starts in 1th box it gain empty line
+        //TODO: Point only on current date
         public static InlineKeyboardMarkup GetCalendarKeyboard(DateTime date)
         {
             int firstDay = 1, day = 1, daysInMonth;
             List<List<string>> days = new List<List<string>>();
             daysInMonth = DateTime.DaysInMonth(date.Day, date.Month);
 
-            for (; firstDay < 8; firstDay++) //find first day
+            for (; firstDay < 7; firstDay++) //find first day
             {
                 if (((int)new DateTime(date.Year, date.Month, 1).DayOfWeek) == firstDay) break;
             }
@@ -43,7 +43,7 @@ namespace TeamCalendarEventBot.Services
 
         static InlineKeyboardMarkup GetCalendar(List<List<string>> days, DateTime date)
         {
-            string endCallback = "." + ((date.Month / 10 > 0) ? date.Month.ToString() : "0" + date.Month.ToString()) + "." + date.Year.ToString();
+            string endCallback = "." + ZeroAdder.AddZero(date.Month) + "." + date.Year.ToString();
             List<List<InlineKeyboardButton>> keyboardButtons = new List<List<InlineKeyboardButton>>
                 {
                     new List<InlineKeyboardButton>{ new InlineKeyboardButton("<") {CallbackData = $"{CallbackConst.ChangeMonth} {date.Month - 1}"}, new InlineKeyboardButton(MonthConverter.NumberToText(date.Month)) { CallbackData = "nothing" }, new InlineKeyboardButton(">") { CallbackData = $"{CallbackConst.ChangeMonth} {date.Month + 1}" } },
@@ -54,7 +54,7 @@ namespace TeamCalendarEventBot.Services
                 keyboardButtons.Add(new List<InlineKeyboardButton> { });
                 for (int j = 0; j < 7; j++)
                 {
-                    keyboardButtons[i + 2].Add(new InlineKeyboardButton(days[i][j] + ((days[i][j] == date.Day.ToString()) ? "." : "")) { CallbackData = (days[i][j] == " ") ? "nothing" : ((int.Parse(days[i][j]) / 10 > 0) ? days[i][j] : "0" + days[i][j]) + endCallback });
+                    keyboardButtons[i + 2].Add(new InlineKeyboardButton(days[i][j] + ((days[i][j] == date.Day.ToString()) ? "." : "")) { CallbackData = (days[i][j] == " ") ? "nothing" : ZeroAdder.AddZero(int.Parse(days[i][j])) + endCallback });
                 }
             }
             return new InlineKeyboardMarkup(keyboardButtons);
