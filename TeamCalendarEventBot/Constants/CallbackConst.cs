@@ -9,5 +9,6 @@ namespace TeamCalendarEventBot.Constants
     public static class CallbackConst
     {
         public const string ChangeMonth = "changeMonth";
+        public const string Nothing = "nothing";
     }
 }

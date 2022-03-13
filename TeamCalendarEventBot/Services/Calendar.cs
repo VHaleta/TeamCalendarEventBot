@@ -11,7 +11,6 @@ namespace TeamCalendarEventBot.Services
 {
     static class Calendar
     {
-        //TODO: Point only on current date
         public static InlineKeyboardMarkup GetCalendarKeyboard(DateTime date)
         {
             int firstDay = 1, day = 1, daysInMonth;
@@ -40,21 +39,23 @@ namespace TeamCalendarEventBot.Services
 
             return GetCalendar(days, date);
         }
-
+        //TODO: cahnge dd.mm.yyyy
         static InlineKeyboardMarkup GetCalendar(List<List<string>> days, DateTime date)
         {
+            var prevMonth = date.AddMonths(-1);
+            var nextMonth = date.AddMonths(1);
             string endCallback = "." + ZeroAdder.AddZero(date.Month) + "." + date.Year.ToString();
             List<List<InlineKeyboardButton>> keyboardButtons = new List<List<InlineKeyboardButton>>
                 {
-                    new List<InlineKeyboardButton>{ new InlineKeyboardButton("<") {CallbackData = $"{CallbackConst.ChangeMonth} {date.Month - 1}"}, new InlineKeyboardButton(MonthConverter.NumberToText(date.Month)) { CallbackData = "nothing" }, new InlineKeyboardButton(">") { CallbackData = $"{CallbackConst.ChangeMonth} {date.Month + 1}" } },
-                    new List<InlineKeyboardButton>{new InlineKeyboardButton("ПН") { CallbackData = "nothing" }, new InlineKeyboardButton("ВТ") { CallbackData = "nothing" }, new InlineKeyboardButton("СР") { CallbackData = "nothing" }, new InlineKeyboardButton("ЧТ") { CallbackData = "nothing" }, new InlineKeyboardButton("ПТ") { CallbackData = "nothing" }, new InlineKeyboardButton("СБ") { CallbackData = "nothing" }, new InlineKeyboardButton("ВС") { CallbackData = "nothing" } } ,
+                    new List<InlineKeyboardButton>{ new InlineKeyboardButton("<") { CallbackData = $"{CallbackConst.ChangeMonth} {prevMonth.Month} {prevMonth.Year}"}, new InlineKeyboardButton(MonthConverter.NumberToText(date.Month)) { CallbackData = CallbackConst.Nothing }, new InlineKeyboardButton(">") { CallbackData = $"{CallbackConst.ChangeMonth} {nextMonth.Month} {nextMonth.Year}" } },
+                    new List<InlineKeyboardButton>{ new InlineKeyboardButton("ПН") { CallbackData = CallbackConst.Nothing }, new InlineKeyboardButton("ВТ") { CallbackData = CallbackConst.Nothing }, new InlineKeyboardButton("СР") { CallbackData = CallbackConst.Nothing }, new InlineKeyboardButton("ЧТ") { CallbackData = CallbackConst.Nothing }, new InlineKeyboardButton("ПТ") { CallbackData = CallbackConst.Nothing }, new InlineKeyboardButton("СБ") { CallbackData = CallbackConst.Nothing }, new InlineKeyboardButton("ВС") { CallbackData = CallbackConst.Nothing } } ,
                 };
             for (int i = 0; i < days.Count; i++)
             {
                 keyboardButtons.Add(new List<InlineKeyboardButton> { });
                 for (int j = 0; j < 7; j++)
                 {
-                    keyboardButtons[i + 2].Add(new InlineKeyboardButton(days[i][j] + ((days[i][j] == date.Day.ToString()) ? "." : "")) { CallbackData = (days[i][j] == " ") ? "nothing" : ZeroAdder.AddZero(int.Parse(days[i][j])) + endCallback });
+                    keyboardButtons[i + 2].Add(new InlineKeyboardButton(days[i][j] + ((days[i][j] == DateTime.Today.Day.ToString() && date.Month == DateTime.Today.Month) ? "." : "")) { CallbackData = (days[i][j] == " ") ? "nothing" : ZeroAdder.AddZero(int.Parse(days[i][j])) + endCallback });
                 }
             }
             return new InlineKeyboardMarkup(keyboardButtons);

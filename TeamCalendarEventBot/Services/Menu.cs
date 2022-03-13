@@ -61,7 +61,7 @@ namespace TeamCalendarEventBot.Services
                 buttons.Add(new List<KeyboardButton> { new KeyboardButton("Добавить событие(для себя)") });
 
             if ((permission & Permission.CommonCalendar) == Permission.CommonCalendar)
-                buttons.Add(new List<KeyboardButton> { new KeyboardButton("Добавить событие(для всех)") });
+                buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.AddEventForAll) });
 
             if (((permission & Permission.OwnCalendar) == Permission.OwnCalendar) || ((permission & Permission.CommonCalendar) == Permission.CommonCalendar))
                 buttons.Add(new List<KeyboardButton> { new KeyboardButton("Редактировать события") });

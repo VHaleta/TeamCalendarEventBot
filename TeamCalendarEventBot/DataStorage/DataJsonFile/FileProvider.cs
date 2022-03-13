@@ -6,7 +6,7 @@ namespace TeamCalendarEventBot.DataStorage.DataJsonFile
     public class FileProvider : IFileProvider
     {
         #region Fields
-        protected string _directoryPath = $"{System.AppContext.BaseDirectory}Data";
+        protected string _directoryPath = $"{AppContext.BaseDirectory}Data";
         #endregion
 
         #region Constructors

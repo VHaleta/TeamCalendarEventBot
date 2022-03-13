@@ -14,7 +14,7 @@ namespace TeamCalendarEventBot.Services
     public static class EventHandler
     {
         private static readonly IEventDataProvider _dataProvider;
-//        private static readonly object _locker = new();
+        //        private static readonly object _locker = new();
         private static readonly List<CalendarEvent> _allGeneralEvents;
 
         static EventHandler()
@@ -30,23 +30,21 @@ namespace TeamCalendarEventBot.Services
         public static async Task ShowCalendarEventsByDateAsync(ITelegramBotClient botClient, DateTime date, UserBot user)
         {
             string result = $"События на {ZeroAdder.AddZero(date.Day)}.{ZeroAdder.AddZero(date.Month)}.{date.Year}\n\n";
-            int count = 0;
-            foreach (var item in _allGeneralEvents)
+            var foundEvents = _allGeneralEvents.Where(x => x.Date == date);
+            foreach (var item in foundEvents)
             {
-                if(item.Date == date)
-                {
-                    result += $"{item.Header}\n{item.Text}\n\n";
-                    count++;
-                }
+                result += $"{item.Header}\n{item.Text}\n\n";
             }
-            if (count == 0) result += "Событий нет";
+
+            if (!foundEvents.Any()) result += "Событий нет";
             await botClient.SendTextMessageAsync(user.ChatId, result);
         }
 
-        public static void AddGeneralEvent(CalendarEvent calendarEvent)
+        public static void AddGeneralEvent(ITelegramBotClient botClient, UserBot user)
         {
-            _allGeneralEvents.Add(calendarEvent);
-            _dataProvider.AddGeneralEvent(calendarEvent);
+
+            //            _allGeneralEvents.Add(calendarEvent);
+            //            _dataProvider.AddGeneralEvent(calendarEvent);
         }
 
         public static void DeleteGeneralEvent(CalendarEvent calendarEvent)
