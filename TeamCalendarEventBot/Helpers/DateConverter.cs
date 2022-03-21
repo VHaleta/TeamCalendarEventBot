@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace TeamCalendarEventBot.Helpers
 {
-    public static class MonthConverter
+    public static class DateConverter
     {
-        public static string NumberToText(int month)
+        public static string NumberToMonth(int month)
         {
             switch (month)
             {
@@ -25,6 +25,30 @@ namespace TeamCalendarEventBot.Helpers
                 case 11: return "Ноябрь/Листопад";
                 case 12: return "Декабрь/Грудень";
                     default: return "unknown";
+            }
+        }
+
+        public static string EngToRusDay(string day)
+        {
+            //
+            day = day.ToLower();
+            switch (day)
+            {
+                case "monday":
+                    return "понедельник";
+                case "tuesday":
+                    return "вторник";
+                case "wednesday":
+                    return "среду";
+                case "thursday":
+                    return "четверг";
+                case "friday":
+                    return "пятницу";
+                case "saturday":
+                    return "субботу";
+                case "sunday":
+                    return "воскресенье";
+                    default : return "unknown";
             }
         }
     }

@@ -38,13 +38,13 @@ namespace TeamCalendarEventBot.Services
 
             if ((permission & Permission.View) == Permission.View)
             {
-                buttons.Add(new List<KeyboardButton> { new KeyboardButton("События на сегодня"), new KeyboardButton("События на завтра")});
-                buttons.Add(new List<KeyboardButton> { new KeyboardButton("События на неделю") });
+                buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.OnWeekEvents) });
             }
 
             if (((permission & Permission.OwnCalendar) == Permission.OwnCalendar) || ((permission & Permission.CommonCalendar) == Permission.CommonCalendar))
                 buttons.Add(new List<KeyboardButton> { new KeyboardButton("Редактировать события") });
 
+            buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.ResendCalendar) });
             buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.BackToMainMenu) });
 
             return buttons;

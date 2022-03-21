@@ -24,20 +24,22 @@ namespace TeamCalendarEventBot.Sevices
 
             var action = message.Text! switch
             {
-                //"/inline" => SendInlineKeyboard(botClient, message),
-                //"/keyboard" => SendReplyKeyboard(botClient, message),
-                //"/remove" => RemoveKeyboard(botClient, message),
-                //"/photo" => SendFile(botClient, message),
-                //"/request" => RequestContactAndLocation(botClient, message),
+                //Commands
                 "/start" => StartupMessageAsync(botClient, user),
-                MessageConst.BackToMainMenu => StartupMessageAsync(botClient, user),
+                //Startapmenu
                 MessageConst.Calendar => CalendarMessageAsync(botClient, user),
+                //CalendarMenu
                 MessageConst.AddEventForAll => AddEventForAllAsync(botClient, user),
+                MessageConst.ResendCalendar => CalendarMessageAsync(botClient, user),
+                MessageConst.OnWeekEvents => OnWeekEventsAsync(botClient, user),
+                //General
+                MessageConst.BackToMainMenu => StartupMessageAsync(botClient, user),
                 _ => UnknownMessageAsync(botClient, user)
             };
 
             await action;
         }
+
         public static async Task BotOnCallbackQueryReceived(ITelegramBotClient botClient, CallbackQuery callbackQuery, UserBot user)
         {
             Console.WriteLine($"Receive update type: CallbackQuery: {callbackQuery.Data}\nchat id: {user.ChatId} username: {user.Username}\n----------------------------------------------------");
@@ -81,9 +83,15 @@ namespace TeamCalendarEventBot.Sevices
         {
             await botClient.SendTextMessageAsync(chatId: user.ChatId, text: "Неизвестное сообщение\nДля начального меню введите команду /start");
         }
-        public static async Task AddEventForAllAsync(ITelegramBotClient botClient, UserBot user)
+        //TODO: adding events
+        private static async Task AddEventForAllAsync(ITelegramBotClient botClient, UserBot user)
         {
 //            await Services.EventHandler.AddGeneralEvent();
+        }
+
+        private static async Task OnWeekEventsAsync(ITelegramBotClient botClient, UserBot user)
+        {
+            await Services.EventHandler.ShowCalendarEventsByWeekAsync(botClient, DateTime.Today, user);
         }
 
         #endregion

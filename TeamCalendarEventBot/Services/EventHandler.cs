@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using TeamCalendarEventBot.Constants;
 using TeamCalendarEventBot.DataStorage;
 using TeamCalendarEventBot.DataStorage.DataJsonFile;
 using TeamCalendarEventBot.Helpers;
@@ -29,7 +29,7 @@ namespace TeamCalendarEventBot.Services
 
         public static async Task ShowCalendarEventsByDateAsync(ITelegramBotClient botClient, DateTime date, UserBot user)
         {
-            string result = $"События на {ZeroAdder.AddZero(date.Day)}.{ZeroAdder.AddZero(date.Month)}.{date.Year}\n\n";
+            string result = $"События на {date.ToString("dd.MM.yyyy")}\n\n";
             var foundEvents = _allGeneralEvents.Where(x => x.Date == date);
             foreach (var item in foundEvents)
             {
@@ -40,9 +40,34 @@ namespace TeamCalendarEventBot.Services
             await botClient.SendTextMessageAsync(user.ChatId, result);
         }
 
-        public static void AddGeneralEvent(ITelegramBotClient botClient, UserBot user)
+        public static async Task ShowCalendarEventsByWeekAsync(ITelegramBotClient botClient, DateTime date, UserBot user)
         {
+            string result = "";
+            int dayOfWeek = (int)date.DayOfWeek;
+            for (int i = date.Day - dayOfWeek + 1; i <= date.Day + 7 - dayOfWeek; i++)
+            {
+                DateTime tempDate = new DateTime(date.Year, date.Month, i);
+                var foundEvents = _allGeneralEvents.Where(x => x.Date == tempDate);
+                if (foundEvents.Any()) result += $"На {DateConverter.EngToRusDay(tempDate.DayOfWeek.ToString())}\n\n";
+                foreach (var item in foundEvents)
+                {
+                    result += $"{item.Header}\n{item.Text}\n\n";
+                }
+            }
+            if (result == "") result = "Событий нет";
+            await botClient.SendTextMessageAsync(user.ChatId, result);
 
+        }
+
+        public static async Task AddGeneralEvent(ITelegramBotClient botClient, UserBot user)
+        {
+            if (((Permission)user.Permissions & Permission.CommonCalendar) != Permission.CommonCalendar)
+            {
+                await botClient.SendTextMessageAsync(user.ChatId, "У вас недостаточно прав");
+                return;
+            }
+
+            //            await botClient.SendTextMessageAsync(user.ChatId, "Введите заглавие", )
             //            _allGeneralEvents.Add(calendarEvent);
             //            _dataProvider.AddGeneralEvent(calendarEvent);
         }
