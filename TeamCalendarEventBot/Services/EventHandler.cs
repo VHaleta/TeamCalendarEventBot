@@ -67,7 +67,7 @@ namespace TeamCalendarEventBot.Services
                 return;
             }
 
-            //            await botClient.SendTextMessageAsync(user.ChatId, "Введите заглавие", )
+//            await botClient.SendTextMessageAsync(user.ChatId, "Введите заглавие");
             //            _allGeneralEvents.Add(calendarEvent);
             //            _dataProvider.AddGeneralEvent(calendarEvent);
         }

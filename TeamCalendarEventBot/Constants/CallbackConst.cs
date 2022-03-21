@@ -10,5 +10,7 @@ namespace TeamCalendarEventBot.Constants
     {
         public const string ChangeMonth = "changeMonth";
         public const string Nothing = "nothing";
+        public const string GetEvents = "getEvents";
+        public const string Adding = "adding";
     }
 }

@@ -44,25 +44,29 @@ namespace TeamCalendarEventBot.Sevices
         {
             Console.WriteLine($"Receive update type: CallbackQuery: {callbackQuery.Data}\nchat id: {user.ChatId} username: {user.Username}\n----------------------------------------------------");
             string data = callbackQuery.Data;
-            DateTime date;
-            if (!DateTime.TryParse(data, out date))
+            string[] dataSplit = data.Split();
+            switch (dataSplit[0])
             {
-                string[] dataSplit = data.Split();
-                switch (dataSplit[0])
-                {
-                    case CallbackConst.ChangeMonth:
-                        int month = 0, year = 0;
-                        if (!int.TryParse(dataSplit[1], out month) || !int.TryParse(dataSplit[2], out year))
-                        {
-                            Console.WriteLine($"Wrong format of month or year: {dataSplit[1]} {dataSplit[2]}");
-                        }
-                        await ChangeMonthAsync(botClient, callbackQuery, user, month, year);
-                        break;
-                }
-            }
-            else
-            {
-                await ShowCalendarEventsByDateAsync(botClient, date, user);
+                case CallbackConst.ChangeMonth:
+                    int month = 0, year = 0;
+                    if (!int.TryParse(dataSplit[1], out month) || !int.TryParse(dataSplit[2], out year))
+                    {
+                        Console.WriteLine($"Wrong format of month or year: {dataSplit[1]} {dataSplit[2]}");
+                    }
+                    await ChangeMonthAsync(botClient, callbackQuery, user, month, year);
+                    break;
+                case CallbackConst.GetEvents:
+                    DateTime date;
+                    if (!DateTime.TryParse(dataSplit[1], out date))
+                    {
+                        Console.WriteLine($"Wrong format of date: {dataSplit[1]}");
+                    }
+                    await ShowCalendarEventsByDateAsync(botClient, date.Date, user);
+                    break;
+                default: 
+                    Console.WriteLine($"Unknown callback type: {dataSplit[0]}");
+                    break;
+
             }
         }
         #endregion
@@ -86,7 +90,7 @@ namespace TeamCalendarEventBot.Sevices
         //TODO: adding events
         private static async Task AddEventForAllAsync(ITelegramBotClient botClient, UserBot user)
         {
-//            await Services.EventHandler.AddGeneralEvent();
+            //            await Services.EventHandler.AddGeneralEvent();
         }
 
         private static async Task OnWeekEventsAsync(ITelegramBotClient botClient, UserBot user)
