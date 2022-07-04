@@ -11,6 +11,7 @@ namespace TeamCalendarEventBot.Sevices
 {
     public class UpdateHandler
     {
+        //TODO:Review permissions
         #region UpdateTypes
         public static Task UnknownUpdateHandlerAsync(ITelegramBotClient botClient, Update update)
         {
@@ -90,7 +91,7 @@ namespace TeamCalendarEventBot.Sevices
         //TODO: adding events
         private static async Task AddEventForAllAsync(ITelegramBotClient botClient, UserBot user)
         {
-            //            await Services.EventHandler.AddGeneralEvent();
+//            await Services.EventHandler.AddGeneralEvent(botClient, user);
         }
 
         private static async Task OnWeekEventsAsync(ITelegramBotClient botClient, UserBot user)

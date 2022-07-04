@@ -8,6 +8,7 @@ namespace TeamCalendarEventBot.Services
 {
     public static class Menu
     {
+        //TODO:Review permissions
         static ReplyKeyboardMarkup keyboard;
         public static ReplyKeyboardMarkup GetMenuButtons(Permission permission, MenuStage menuStage)
         {

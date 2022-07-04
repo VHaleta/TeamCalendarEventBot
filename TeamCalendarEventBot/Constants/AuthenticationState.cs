@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace TeamCalendarEventBot.Constants
+﻿namespace TeamCalendarEventBot.Constants
 {
     public enum AuthenticationState
     {

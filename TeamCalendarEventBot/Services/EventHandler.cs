@@ -66,8 +66,9 @@ namespace TeamCalendarEventBot.Services
                 await botClient.SendTextMessageAsync(user.ChatId, "У вас недостаточно прав");
                 return;
             }
+            await botClient.SendTextMessageAsync(chatId: user.ChatId, MessageConst.Calendar, replyMarkup: Calendar.GetAddingEventKetboard(DateTime.Today));
 
-//            await botClient.SendTextMessageAsync(user.ChatId, "Введите заглавие");
+            //            await botClient.SendTextMessageAsync(user.ChatId, "Введите заглавие");
             //            _allGeneralEvents.Add(calendarEvent);
             //            _dataProvider.AddGeneralEvent(calendarEvent);
         }
