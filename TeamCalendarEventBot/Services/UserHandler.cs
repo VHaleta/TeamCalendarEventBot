@@ -99,5 +99,13 @@ namespace TeamCalendarEventBot.Services
                 return user;
             }
         }
+
+        public static void UpdateUser(UserBot user)
+        {
+            lock (_locker)
+            {
+                _dataProvider.UpsertUser(user);
+            }
+        }
     }
 }

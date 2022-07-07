@@ -23,6 +23,18 @@ namespace TeamCalendarEventBot.Sevices
             if (message.Type != MessageType.Text) return;
             Console.WriteLine($"Receive update type: Message: {message.Text}\nchat id: {user.ChatId} username: {user.Username}\n----------------------------------------------------");
 
+            if (user.UserStatus != UserStatus.None)
+            {
+                switch(user.UserStatus)
+                {
+                    case UserStatus.Adding:
+                        await OnAddingEventAsync(botClient, user, message.Text);
+                        break;
+                    default:
+                        break;
+                };
+                return;
+            }
             var action = message.Text! switch
             {
                 //Commands
@@ -44,8 +56,10 @@ namespace TeamCalendarEventBot.Sevices
         public static async Task BotOnCallbackQueryReceived(ITelegramBotClient botClient, CallbackQuery callbackQuery, UserBot user)
         {
             Console.WriteLine($"Receive update type: CallbackQuery: {callbackQuery.Data}\nchat id: {user.ChatId} username: {user.Username}\n----------------------------------------------------");
+            user.UserStatus = UserStatus.None;
             string data = callbackQuery.Data;
             string[] dataSplit = data.Split();
+            DateTime date;
             switch (dataSplit[0])
             {
                 case CallbackConst.ChangeMonth:
@@ -57,12 +71,21 @@ namespace TeamCalendarEventBot.Sevices
                     await ChangeMonthAsync(botClient, callbackQuery, user, month, year);
                     break;
                 case CallbackConst.GetEvents:
-                    DateTime date;
                     if (!DateTime.TryParse(dataSplit[1], out date))
                     {
                         Console.WriteLine($"Wrong format of date: {dataSplit[1]}");
                     }
                     await ShowCalendarEventsByDateAsync(botClient, date.Date, user);
+                    break;
+                case CallbackConst.Adding:
+                    if (!DateTime.TryParse(dataSplit[1], out date))
+                    {
+                        Console.WriteLine($"Wrong format of date: {dataSplit[1]}");
+                    }
+                    user.UserStatus = UserStatus.Adding;
+                    user.TempCalendarEvent = new CalendarEvent() { Date = date };
+                    await botClient.SendTextMessageAsync(user.ChatId, $"Вы выбрали дату: {date.ToString("dd.mm.yyyy")}\nНапишите текст события:");
+                    UserHandler.UpdateUser(user);
                     break;
                 default: 
                     Console.WriteLine($"Unknown callback type: {dataSplit[0]}");
@@ -91,12 +114,20 @@ namespace TeamCalendarEventBot.Sevices
         //TODO: adding events
         private static async Task AddEventForAllAsync(ITelegramBotClient botClient, UserBot user)
         {
-//            await Services.EventHandler.AddGeneralEvent(botClient, user);
+            await botClient.SendTextMessageAsync(chatId: user.ChatId, MessageConst.Calendar, replyMarkup: Calendar.GetAddingEventKetboard(DateTime.Today));
         }
 
         private static async Task OnWeekEventsAsync(ITelegramBotClient botClient, UserBot user)
         {
             await Services.EventHandler.ShowCalendarEventsByWeekAsync(botClient, DateTime.Today, user);
+        }
+
+        private static async Task OnAddingEventAsync(ITelegramBotClient botClient, UserBot user, string message)
+        {
+            user.TempCalendarEvent.Text = message;
+            await Services.EventHandler.AddGeneralEventAsync(botClient, user, user.TempCalendarEvent);
+            user.UserStatus = UserStatus.None;
+            UserHandler.UpdateUser(user);
         }
 
         #endregion

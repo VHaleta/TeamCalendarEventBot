@@ -30,7 +30,6 @@ namespace TeamCalendarEventBot.Services
             var user = UserHandler.GetUser(update);
             if (!user.Active) return;
             if (!UserHandler.IsUserAuthorizedAsync(botClient, update.Message, user).Result) return;
-
             var handler = update.Type switch
             {
                 // TODO: Add more processing update types

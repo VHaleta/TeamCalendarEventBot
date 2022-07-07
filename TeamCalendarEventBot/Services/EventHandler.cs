@@ -21,10 +21,6 @@ namespace TeamCalendarEventBot.Services
         {
             _dataProvider = new JsonFileDataClient().EventDataProvider;
             _allGeneralEvents = _dataProvider.GetGeneralEvents();
-            _allGeneralEvents.Add(new CalendarEvent() { Id = 1, Date = new DateTime(2022, 3, 12), Header = "Событие 1", Text = "qqqqqqqq q qqqqqq q qqqq  qq q qq qqq q qq q q q qqq qq" });
-            _allGeneralEvents.Add(new CalendarEvent() { Id = 2, Date = new DateTime(2022, 3, 12), Header = "Событие 2", Text = "qqqqqqqq q qqqqqq q qqqq  qq q qq qqq q qq q q q qqq qq" });
-            _allGeneralEvents.Add(new CalendarEvent() { Id = 3, Date = new DateTime(2022, 3, 12), Header = "Событие 3", Text = "qqqqqqqq q qqqqqq q qqqq  qq q qq qqq q qq q q q qqq qq" });
-            _allGeneralEvents.Add(new CalendarEvent() { Id = 4, Date = new DateTime(2022, 4, 12), Header = "Событие 4", Text = "qqqqqqqq q qqqqqq q qqqq  qq q qq qqq q qq q q q qqq qq" });
         }
 
         public static async Task ShowCalendarEventsByDateAsync(ITelegramBotClient botClient, DateTime date, UserBot user)
@@ -33,7 +29,7 @@ namespace TeamCalendarEventBot.Services
             var foundEvents = _allGeneralEvents.Where(x => x.Date == date);
             foreach (var item in foundEvents)
             {
-                result += $"{item.Header}\n{item.Text}\n\n";
+                result += $"{item.Text}\n\n";
             }
 
             if (!foundEvents.Any()) result += "Событий нет";
@@ -51,7 +47,7 @@ namespace TeamCalendarEventBot.Services
                 if (foundEvents.Any()) result += $"На {DateConverter.EngToRusDay(tempDate.DayOfWeek.ToString())}\n\n";
                 foreach (var item in foundEvents)
                 {
-                    result += $"{item.Header}\n{item.Text}\n\n";
+                    result += $"{item.Text}\n\n";
                 }
             }
             if (result == "") result = "Событий нет";
@@ -59,18 +55,16 @@ namespace TeamCalendarEventBot.Services
 
         }
 
-        public static async Task AddGeneralEvent(ITelegramBotClient botClient, UserBot user)
+        public static async Task AddGeneralEventAsync(ITelegramBotClient botClient, UserBot user, CalendarEvent calendarEvent)
         {
             if (((Permission)user.Permissions & Permission.CommonCalendar) != Permission.CommonCalendar)
             {
                 await botClient.SendTextMessageAsync(user.ChatId, "У вас недостаточно прав");
                 return;
             }
-            await botClient.SendTextMessageAsync(chatId: user.ChatId, MessageConst.Calendar, replyMarkup: Calendar.GetAddingEventKetboard(DateTime.Today));
 
-            //            await botClient.SendTextMessageAsync(user.ChatId, "Введите заглавие");
-            //            _allGeneralEvents.Add(calendarEvent);
-            //            _dataProvider.AddGeneralEvent(calendarEvent);
+            _allGeneralEvents.Add(calendarEvent);
+            _dataProvider.AddGeneralEvent(calendarEvent);
         }
 
         public static void DeleteGeneralEvent(CalendarEvent calendarEvent)
