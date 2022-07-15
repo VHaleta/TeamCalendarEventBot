@@ -104,8 +104,23 @@ namespace TeamCalendarEventBot.Services
         {
             lock (_locker)
             {
+                var temp = _allUsers.FirstOrDefault(x => x.ChatId == user.ChatId);
+                if (user == null) return;
+                _allUsers.Remove(temp);
+                _allUsers.Add(user);
                 _dataProvider.UpsertUser(user);
             }
+        }
+
+        public static List<UserBot> GetAllRequestedUsers()
+        {
+            List<UserBot> result = _allUsers.FindAll(x => x.Auth == AuthenticationState.Requested).ToList();
+            return result;
+        }
+
+        public static UserBot FindUser(long chatId)
+        {
+            return _allUsers.FirstOrDefault(x => x.ChatId == chatId);
         }
     }
 }

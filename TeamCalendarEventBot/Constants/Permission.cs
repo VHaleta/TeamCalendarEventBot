@@ -7,6 +7,8 @@ namespace TeamCalendarEventBot.Constants
         Unknown = 0,
         View = 1,
         OwnCalendar = 2,
-        CommonCalendar = 4
+        CommonCalendar = 4,
+        Authorizating = 8,
+        GivingPermissions = 16,
     }
 }
