@@ -12,18 +12,18 @@ namespace TeamCalendarEventBot.Helpers
         {
             switch (month)
             {
-                case 1: return "Январь/Січень";
-                case 2: return "Февраль/Лютий";
-                case 3: return "Март/Березень";
-                case 4: return "Апрель/Квітень";
-                case 5: return "Май/Травень";
-                case 6: return "Июнь/Червень";
-                case 7: return "Июль/Липень";
-                case 8: return "Август/Серпень";
-                case 9: return "Сентябрь/Вересень";
-                case 10: return "Октябрь/Жовтень";
-                case 11: return "Ноябрь/Листопад";
-                case 12: return "Декабрь/Грудень";
+                case 1: return "Січень";
+                case 2: return "Лютий";
+                case 3: return "Березень";
+                case 4: return "Квітень";
+                case 5: return "Травень";
+                case 6: return "Червень";
+                case 7: return "Липень";
+                case 8: return "Серпень";
+                case 9: return "Вересень";
+                case 10: return "Жовтень";
+                case 11: return "Листопад";
+                case 12: return "Грудень";
                     default: return "unknown";
             }
         }
@@ -35,19 +35,19 @@ namespace TeamCalendarEventBot.Helpers
             switch (day)
             {
                 case "monday":
-                    return "понедельник";
+                    return "понеділок";
                 case "tuesday":
-                    return "вторник";
+                    return "вівторок";
                 case "wednesday":
-                    return "среду";
+                    return "середу";
                 case "thursday":
-                    return "четверг";
+                    return "четвер";
                 case "friday":
-                    return "пятницу";
+                    return "п'ятницю";
                 case "saturday":
-                    return "субботу";
+                    return "суботу";
                 case "sunday":
-                    return "воскресенье";
+                    return "неділю";
                     default : return "unknown";
             }
         }

@@ -40,9 +40,9 @@ namespace TeamCalendarEventBot.Sevices
             var action = message.Text! switch
             {
                 //Commands
-                "/start" => StartupMessageAsync(botClient, user),
-                "/authentication" => AuthenticationCommandAsync(botClient, user),
-                "/commands" => CommandsCommandAsync(botClient, user),
+                MessageConst.Start => StartupMessageAsync(botClient, user),
+                MessageConst.Authentication => AuthenticationCommandAsync(botClient, user),
+                MessageConst.Commands => CommandsCommandAsync(botClient, user),
                 //Startapmenu
                 MessageConst.Calendar => CalendarMessageAsync(botClient, user),
                 //CalendarMenu
@@ -89,17 +89,17 @@ namespace TeamCalendarEventBot.Sevices
         private static async Task CalendarMessageAsync(ITelegramBotClient botClient, UserBot user)
         {
             await botClient.SendTextMessageAsync(user.ChatId, MessageConst.Calendar, replyMarkup: Calendar.GetCalendarKeyboard(DateTime.Today));
-            await botClient.SendTextMessageAsync(user.ChatId, "Выберите действие", replyMarkup: Menu.GetMenuButtons((Permission)user.Permissions, MenuStage.CalendarMenu));
+            await botClient.SendTextMessageAsync(user.ChatId, MessageConst.ChoseAction, replyMarkup: Menu.GetMenuButtons((Permission)user.Permissions, MenuStage.CalendarMenu));
         }
 
         private static async Task StartupMessageAsync(ITelegramBotClient botClient, UserBot user)
         {
-            await botClient.SendTextMessageAsync(user.ChatId, "Выберите действие", replyMarkup: Menu.GetMenuButtons((Permission)user.Permissions, MenuStage.MainMenu));
+            await botClient.SendTextMessageAsync(user.ChatId, MessageConst.ChoseAction, replyMarkup: Menu.GetMenuButtons((Permission)user.Permissions, MenuStage.MainMenu));
         }
 
         private static async Task UnknownMessageAsync(ITelegramBotClient botClient, UserBot user)
         {
-            await botClient.SendTextMessageAsync(user.ChatId, text: "Неизвестное сообщение\nДля начального меню введите команду /start");
+            await botClient.SendTextMessageAsync(user.ChatId, text: MessageConst.UnknownMessage);
         }
         //TODO: adding events
         private static async Task AddEventForAllMessageAsync(ITelegramBotClient botClient, UserBot user)
@@ -116,6 +116,7 @@ namespace TeamCalendarEventBot.Sevices
         {
             user.TempCalendarEvent.Text = message;
             await Services.EventHandler.AddGeneralEventAsync(botClient, user, user.TempCalendarEvent);
+            await botClient.SendTextMessageAsync(user.ChatId, $"{MessageConst.YouAddedEventOn} {user.TempCalendarEvent.Date.ToString("dd.MM.yyyy")}");
             user.UserStatus = UserStatus.None;
             UserHandler.UpdateUser(user);
         }
@@ -171,7 +172,7 @@ namespace TeamCalendarEventBot.Sevices
             }
             user.UserStatus = UserStatus.Adding;
             user.TempCalendarEvent = new CalendarEvent() { Date = date };
-            await botClient.SendTextMessageAsync(user.ChatId, $"Вы выбрали дату: {date.ToString("dd.mm.yyyy")}\nНапишите текст события:");
+            await botClient.SendTextMessageAsync(user.ChatId, $"{MessageConst.YouHaveChosenDate}: {date.ToString("dd.MM.yyyy")}\n{MessageConst.WriteEventText}:");
             UserHandler.UpdateUser(user);
         }
 
@@ -191,7 +192,8 @@ namespace TeamCalendarEventBot.Sevices
             }
             authUser.Auth = AuthenticationState.Approved;
             UserHandler.UpdateUser(authUser);
-            await botClient.SendTextMessageAsync(user.ChatId, $"Пользователя @{authUser.Username} авторизовано");
+            await botClient.SendTextMessageAsync(authUser.ChatId, MessageConst.YouHaveBeenAuthorized);
+            await botClient.SendTextMessageAsync(user.ChatId, MessageConst.UserHaveBeenAuthorized(authUser.Username));
         }
         #endregion
     }

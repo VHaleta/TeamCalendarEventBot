@@ -38,13 +38,13 @@ namespace TeamCalendarEventBot.Services
                 }
                 else
                 {
-                    _ = await botClient.SendTextMessageAsync(chatId: user.ChatId, "Вы не авторизированы", replyMarkup: Menu.NoneAuthKeybord());
+                    _ = await botClient.SendTextMessageAsync(chatId: user.ChatId, MessageConst.YouAreNotAuthorized, replyMarkup: Menu.NoneAuthKeybord());
                 }
             }
 
             if (user.Auth == AuthenticationState.Requested)
             {
-                _ = await botClient.SendTextMessageAsync(chatId: user.ChatId, "Авторизация запрошена", replyMarkup: Menu.NoneAuthKeybord());
+                _ = await botClient.SendTextMessageAsync(chatId: user.ChatId, MessageConst.YouAreNotAuthorized, replyMarkup: Menu.NoneAuthKeybord());
             }
 
             return false;

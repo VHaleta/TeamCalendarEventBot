@@ -43,7 +43,7 @@ namespace TeamCalendarEventBot.Services
             }
 
             if (((permission & Permission.OwnCalendar) == Permission.OwnCalendar) || ((permission & Permission.CommonCalendar) == Permission.CommonCalendar))
-                buttons.Add(new List<KeyboardButton> { new KeyboardButton("Редактировать события") });
+                buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.EditEvent) });
 
             buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.ResendCalendar) });
             buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.BackToMainMenu) });
@@ -59,13 +59,13 @@ namespace TeamCalendarEventBot.Services
                 buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.Calendar) });
 
             if ((permission & Permission.OwnCalendar) == Permission.OwnCalendar)
-                buttons.Add(new List<KeyboardButton> { new KeyboardButton("Добавить событие(для себя)") });
+                buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.AddEventForMe) });
 
             if ((permission & Permission.CommonCalendar) == Permission.CommonCalendar)
                 buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.AddEventForAll) });
 
             if (((permission & Permission.OwnCalendar) == Permission.OwnCalendar) || ((permission & Permission.CommonCalendar) == Permission.CommonCalendar))
-                buttons.Add(new List<KeyboardButton> { new KeyboardButton("Редактировать события") });
+                buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.EditEvent) });
 
             return buttons;
         }

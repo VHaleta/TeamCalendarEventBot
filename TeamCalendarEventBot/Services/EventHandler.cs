@@ -25,14 +25,14 @@ namespace TeamCalendarEventBot.Services
 
         public static async Task ShowCalendarEventsByDateAsync(ITelegramBotClient botClient, DateTime date, UserBot user)
         {
-            string result = $"События на {date.ToString("dd.MM.yyyy")}\n\n";
+            string result = $"{MessageConst.EventsOn} {date.ToString("dd.MM.yyyy")}\n\n";
             var foundEvents = _allGeneralEvents.Where(x => x.Date == date);
             foreach (var item in foundEvents)
             {
                 result += $"{item.Text}\n\n";
             }
 
-            if (!foundEvents.Any()) result += "Событий нет";
+            if (!foundEvents.Any()) result += MessageConst.NoEvents;
             await botClient.SendTextMessageAsync(user.ChatId, result);
         }
 
@@ -50,7 +50,7 @@ namespace TeamCalendarEventBot.Services
                     result += $"{item.Text}\n\n";
                 }
             }
-            if (result == "") result = "Событий нет";
+            if (result == "") result = MessageConst.NoEvents;
             await botClient.SendTextMessageAsync(user.ChatId, result);
 
         }
@@ -59,10 +59,9 @@ namespace TeamCalendarEventBot.Services
         {
             if (((Permission)user.Permissions & Permission.CommonCalendar) != Permission.CommonCalendar)
             {
-                await botClient.SendTextMessageAsync(user.ChatId, "У вас недостаточно прав");
+                await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
                 return;
             }
-
             _allGeneralEvents.Add(calendarEvent);
             _dataProvider.AddGeneralEvent(calendarEvent);
         }
