@@ -67,9 +67,13 @@ namespace TeamCalendarEventBot.Services
             for (int i = 0; i < days.Count; i++)
             {
                 keyboardButtons.Add(new List<InlineKeyboardButton> { });
+                int day;
                 for (int j = 0; j < 7; j++)
                 {
-                    keyboardButtons[i + 2].Add(new InlineKeyboardButton(days[i][j] + ((days[i][j] == DateTime.Today.Day.ToString() && date.Month == DateTime.Today.Month) ? "." : "")) { CallbackData = (days[i][j] == " ") ? $"{prev} nothing" : $"{prev} {days[i][j]}.{date.ToString("MM.yyyy")}" });
+                    if (int.TryParse(days[i][j], out day))
+                        keyboardButtons[i + 2].Add(new InlineKeyboardButton($"{days[i][j]}{((EventHandler.CountCalendarEventsByDate(new DateTime(date.Year, date.Month, day)) > 0) ? $"({EventHandler.CountCalendarEventsByDate(new DateTime(date.Year, date.Month, day))})" : "")}{((days[i][j] == DateTime.Today.Day.ToString() && date.Month == DateTime.Today.Month) ? "!" : "")}") { CallbackData = $"{prev} {days[i][j]}.{date.ToString("MM.yyyy")}"});
+                    else
+                        keyboardButtons[i + 2].Add(new InlineKeyboardButton(" ") { CallbackData = CallbackConst.Nothing });
                 }
             }
 

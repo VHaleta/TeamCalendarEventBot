@@ -55,6 +55,12 @@ namespace TeamCalendarEventBot.Services
 
         }
 
+        public static int CountCalendarEventsByDate(DateTime date)
+        {
+            var foundEvents = _allGeneralEvents.Where(x => x.Date == date);
+            return foundEvents.Count();
+        }
+
         public static async Task AddGeneralEventAsync(ITelegramBotClient botClient, UserBot user, CalendarEvent calendarEvent)
         {
             if (((Permission)user.Permissions & Permission.CommonCalendar) != Permission.CommonCalendar)

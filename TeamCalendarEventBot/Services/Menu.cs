@@ -38,14 +38,17 @@ namespace TeamCalendarEventBot.Services
             List<List<KeyboardButton>> buttons = new List<List<KeyboardButton>>();
 
             if ((permission & Permission.View) == Permission.View)
-            {
                 buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.OnWeekEvents) });
-            }
+
+            if ((permission & Permission.OwnCalendar) == Permission.OwnCalendar)
+                buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.AddEventForMe) });
+
+            if ((permission & Permission.CommonCalendar) == Permission.CommonCalendar)
+                buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.AddEventForAll) });
 
             if (((permission & Permission.OwnCalendar) == Permission.OwnCalendar) || ((permission & Permission.CommonCalendar) == Permission.CommonCalendar))
                 buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.EditEvent) });
 
-            buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.ResendCalendar) });
             buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.BackToMainMenu) });
 
             return buttons;
@@ -58,14 +61,11 @@ namespace TeamCalendarEventBot.Services
             if ((permission & Permission.View) == Permission.View)
                 buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.Calendar) });
 
-            if ((permission & Permission.OwnCalendar) == Permission.OwnCalendar)
-                buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.AddEventForMe) });
+            if((permission & Permission.Authorizating) == Permission.Authorizating)
+                buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.CheckAuthenticationRequests) });
 
-            if ((permission & Permission.CommonCalendar) == Permission.CommonCalendar)
-                buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.AddEventForAll) });
-
-            if (((permission & Permission.OwnCalendar) == Permission.OwnCalendar) || ((permission & Permission.CommonCalendar) == Permission.CommonCalendar))
-                buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.EditEvent) });
+            if ((permission & Permission.GivingPermissions) == Permission.GivingPermissions)
+                buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.ManagePermissions) });
 
             return buttons;
         }

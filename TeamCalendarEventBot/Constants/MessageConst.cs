@@ -6,16 +6,17 @@
         public const string BackToMainMenu = "Повернутися до головного меню";
         public const string Calendar = "Календар";
         public const string AddEventForAll = "Додати подію(для всіх)";
-        public const string ResendCalendar = "Перенадіслати календар";
         public const string OnWeekEvents = "Події на тиждень";
         public const string EditEvent = "Редагувати події";
         public const string AddEventForMe = "Додати подію(для себе)";
+        public const string CheckAuthenticationRequests = "Переверити запити на авторизацію";
+        public const string ManagePermissions = "Керування дозволами";
 
         //commands
-        public const string Start = "/start";
-        public const string Authentication = "/authentication";
-        public const string Commands = "/commands";
-        public const string ManagePermissions = "/managePermissions";
+        public const string StartCommand = "/start";
+        public const string AuthenticationCommand = "/authentication";
+        public const string CommandsCommand = "/commands";
+        public const string ManagePermissionsCommand = "/managePermissions";
 
         //permissions
         public const string PermissionView = "Перегляд календаря";

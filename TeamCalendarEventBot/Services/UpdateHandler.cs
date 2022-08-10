@@ -40,15 +40,16 @@ namespace TeamCalendarEventBot.Sevices
             var action = message.Text! switch
             {
                 //Commands
-                MessageConst.Start => StartupMessageAsync(botClient, user),
-                MessageConst.Authentication => AuthenticationCommandAsync(botClient, user),
-                MessageConst.Commands => CommandsCommandAsync(botClient, user),
-                MessageConst.ManagePermissions => ManagePermissionsAsync(botClient, user),
+                MessageConst.StartCommand => StartupMessageAsync(botClient, user),
+                MessageConst.AuthenticationCommand => AuthenticationMessageAsync(botClient, user),
+                MessageConst.CommandsCommand => CommandsCommandAsync(botClient, user),
+                MessageConst.ManagePermissionsCommand => ManagePermissionsMessageAsync(botClient, user),
                 //Startapmenu
                 MessageConst.Calendar => CalendarMessageAsync(botClient, user),
+                MessageConst.CheckAuthenticationRequests => AuthenticationMessageAsync(botClient, user),
+                MessageConst.ManagePermissions => ManagePermissionsMessageAsync(botClient, user),
                 //CalendarMenu
                 MessageConst.AddEventForAll => AddEventForAllMessageAsync(botClient, user),
-                MessageConst.ResendCalendar => CalendarMessageAsync(botClient, user),
                 MessageConst.OnWeekEvents => OnWeekEventsMessageAsync(botClient, user),
                 //General
                 MessageConst.BackToMainMenu => StartupMessageAsync(botClient, user),
@@ -127,7 +128,7 @@ namespace TeamCalendarEventBot.Sevices
             user.UserStatus = UserStatus.None;
             UserHandler.UpdateUser(user);
         }
-        private static async Task AuthenticationCommandAsync(ITelegramBotClient botClient, UserBot user)
+        private static async Task AuthenticationMessageAsync(ITelegramBotClient botClient, UserBot user)
         {
             if (((Permission)user.Permissions & Permission.Authorizating) != Permission.Authorizating)
             {
@@ -146,10 +147,10 @@ namespace TeamCalendarEventBot.Sevices
         }
         private static async Task CommandsCommandAsync(ITelegramBotClient botClient, UserBot user)
         {
-            await botClient.SendTextMessageAsync(user.ChatId, $"{MessageConst.Start}\n{MessageConst.Commands}\n{MessageConst.Authentication}\n{MessageConst.ManagePermissions}");
+            await botClient.SendTextMessageAsync(user.ChatId, $"{MessageConst.StartCommand}\n{MessageConst.CommandsCommand}\n{MessageConst.AuthenticationCommand}\n{MessageConst.ManagePermissionsCommand}");
         }
 
-        private static async Task ManagePermissionsAsync(ITelegramBotClient botClient, UserBot user)
+        private static async Task ManagePermissionsMessageAsync(ITelegramBotClient botClient, UserBot user)
         {
             if (((Permission)user.Permissions & Permission.GivingPermissions) != Permission.GivingPermissions)
             {
