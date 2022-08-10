@@ -43,6 +43,7 @@ namespace TeamCalendarEventBot.Sevices
                 MessageConst.Start => StartupMessageAsync(botClient, user),
                 MessageConst.Authentication => AuthenticationCommandAsync(botClient, user),
                 MessageConst.Commands => CommandsCommandAsync(botClient, user),
+                MessageConst.ManagePermissions => ManagePermissionsAsync(botClient, user),
                 //Startapmenu
                 MessageConst.Calendar => CalendarMessageAsync(botClient, user),
                 //CalendarMenu
@@ -75,7 +76,13 @@ namespace TeamCalendarEventBot.Sevices
                     await AddingEventCallbackQueryAsync(botClient, user, dataSplit);
                     break;
                 case CallbackConst.Authentication:
-                    await AuthenticateUserCallbackQuery(botClient, user, dataSplit);
+                    await AuthenticateUserCallbackQueryAsync(botClient, user, dataSplit);
+                    break;
+                case CallbackConst.ManagePermissions:
+                    await ManagePermissionsCallbackQueryAsync(botClient, callbackQuery, user, dataSplit);
+                    break;
+                case CallbackConst.ChangePermission:
+                    await ChangePermissionCallbackQueryAsync(botClient, callbackQuery, user, dataSplit);
                     break;
                 default:
                     Console.WriteLine($"Unknown callback type: {dataSplit[0]}");
@@ -122,9 +129,14 @@ namespace TeamCalendarEventBot.Sevices
         }
         private static async Task AuthenticationCommandAsync(ITelegramBotClient botClient, UserBot user)
         {
+            if (((Permission)user.Permissions & Permission.Authorizating) != Permission.Authorizating)
+            {
+                await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
+                return;
+            }
             List<UserBot> users = UserHandler.GetAllRequestedUsers();
             if (users.Count == 0)
-                await botClient.SendTextMessageAsync(user.ChatId, "Запросов на авторизацию нет");
+                await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NoAuthenticationRequests);
             foreach (var item in users)
             {
                 List<InlineKeyboardButton> keyboardButtons = new List<InlineKeyboardButton> {
@@ -134,9 +146,26 @@ namespace TeamCalendarEventBot.Sevices
         }
         private static async Task CommandsCommandAsync(ITelegramBotClient botClient, UserBot user)
         {
-            await botClient.SendTextMessageAsync(user.ChatId, "/authentication\n/commands\n/start");
+            await botClient.SendTextMessageAsync(user.ChatId, $"{MessageConst.Start}\n{MessageConst.Commands}\n{MessageConst.Authentication}\n{MessageConst.ManagePermissions}");
         }
 
+        private static async Task ManagePermissionsAsync(ITelegramBotClient botClient, UserBot user)
+        {
+            if (((Permission)user.Permissions & Permission.GivingPermissions) != Permission.GivingPermissions)
+            {
+                await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
+                return;
+            }
+            List<UserBot> users = UserHandler.GetAllUsersExceptMe(user);
+            if (users.Count == 0)
+                await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NoUsersExist);
+            foreach (UserBot item in users)
+            {
+                List<InlineKeyboardButton> keyboardButtons = new List<InlineKeyboardButton> {
+                    new InlineKeyboardButton(MessageConst.ChangePermissions) { CallbackData = $"{CallbackConst.ManagePermissions} {item.ChatId}"} };
+                await botClient.SendTextMessageAsync(user.ChatId, $"@{item.Username}", replyMarkup: new InlineKeyboardMarkup(keyboardButtons));
+            }
+        }
         #endregion
 
         #region CallbackQuery
@@ -176,8 +205,13 @@ namespace TeamCalendarEventBot.Sevices
             UserHandler.UpdateUser(user);
         }
 
-        private static async Task AuthenticateUserCallbackQuery(ITelegramBotClient botClient, UserBot user, string[] dataSplit)
+        private static async Task AuthenticateUserCallbackQueryAsync(ITelegramBotClient botClient, UserBot user, string[] dataSplit)
         {
+            if (((Permission)user.Permissions & Permission.Authorizating) != Permission.Authorizating)
+            {
+                await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
+                return;
+            }
             long chatId;
             if (!long.TryParse(dataSplit[1], out chatId))
             {
@@ -194,6 +228,105 @@ namespace TeamCalendarEventBot.Sevices
             UserHandler.UpdateUser(authUser);
             await botClient.SendTextMessageAsync(authUser.ChatId, MessageConst.YouHaveBeenAuthorized);
             await botClient.SendTextMessageAsync(user.ChatId, MessageConst.UserHaveBeenAuthorized(authUser.Username));
+        }
+        private static async Task ManagePermissionsCallbackQueryAsync(ITelegramBotClient botClient, CallbackQuery callbackQuery, UserBot user, string[] dataSplit)
+        {
+            if (((Permission)user.Permissions & Permission.GivingPermissions) != Permission.GivingPermissions)
+            {
+                await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
+                return;
+            }
+            long chatId;
+            if (!long.TryParse(dataSplit[1], out chatId))
+            {
+                Console.WriteLine($"Wrong format of chatId: {dataSplit[1]}");
+                return;
+            }
+            UserBot managedUser = UserHandler.FindUser(chatId);
+            if (managedUser == null)
+            {
+                Console.WriteLine($"User {chatId} doesn`t exist");
+                return;
+            }
+            List<List<InlineKeyboardButton>> keyboardButtons = new List<List<InlineKeyboardButton>>
+            {
+                new List<InlineKeyboardButton>(){ new InlineKeyboardButton($"{MessageConst.PermissionView} - {((((Permission)managedUser.Permissions & Permission.View) == Permission.View) ? "так" : "ні")}") { CallbackData = $"{CallbackConst.ChangePermission} {(int)Permission.View} {managedUser.ChatId}" } },
+                new List<InlineKeyboardButton>(){ new InlineKeyboardButton($"{MessageConst.PermissionOwnCalendar} - {((((Permission)managedUser.Permissions & Permission.OwnCalendar) == Permission.OwnCalendar) ? "так" : "ні")}") { CallbackData = $"{CallbackConst.ChangePermission} {(int)Permission.OwnCalendar} {managedUser.ChatId}" } },
+                new List<InlineKeyboardButton>(){ new InlineKeyboardButton($"{MessageConst.PermissionCommonCalendar} - {((((Permission)managedUser.Permissions & Permission.CommonCalendar) == Permission.CommonCalendar) ? "так" : "ні")}") { CallbackData = $"{CallbackConst.ChangePermission} {(int)Permission.CommonCalendar} {managedUser.ChatId}" } },
+                new List<InlineKeyboardButton>(){ new InlineKeyboardButton($"{MessageConst.PermissionAuthorizating} - {((((Permission)managedUser.Permissions & Permission.Authorizating) == Permission.Authorizating) ? "так" : "ні")}") { CallbackData = $"{CallbackConst.ChangePermission} {(int)Permission.Authorizating} {managedUser.ChatId}" } },
+                new List<InlineKeyboardButton>(){ new InlineKeyboardButton($"{MessageConst.PermissionGivingPermissions} - {((((Permission)managedUser.Permissions & Permission.GivingPermissions) == Permission.GivingPermissions) ? "так" : "ні")}") { CallbackData = $"{CallbackConst.ChangePermission} {(int)Permission.GivingPermissions} {managedUser.ChatId}" } }
+            };
+            await botClient.EditMessageReplyMarkupAsync(chatId: user.ChatId, callbackQuery.Message.MessageId, replyMarkup: new InlineKeyboardMarkup(keyboardButtons));
+
+        }
+        private static async Task ChangePermissionCallbackQueryAsync(ITelegramBotClient botClient, CallbackQuery callbackQuery, UserBot user, string[] dataSplit)
+        {
+            if (((Permission)user.Permissions & Permission.GivingPermissions) != Permission.GivingPermissions)
+            {
+                await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
+                return;
+            }
+            long chatId;
+            if (!long.TryParse(dataSplit[2], out chatId))
+            {
+                Console.WriteLine($"Wrong format of chatId: {dataSplit[2]}");
+                return;
+            }
+            int permission;
+            if (!int.TryParse(dataSplit[1], out permission))
+            {
+                Console.WriteLine($"Wrong format of permission: {dataSplit[1]}");
+                return;
+            }
+            UserBot managedUser = UserHandler.FindUser(chatId);
+            Permission permissions = (Permission)managedUser.Permissions;
+            switch ((Permission)permission)
+            {
+                case Permission.View:
+                    if ((permissions & Permission.View) == Permission.View)
+                        permissions &= ~Permission.View;
+                    else
+                        permissions |= Permission.View;
+                    break;
+                case Permission.OwnCalendar:
+                    if ((permissions & Permission.OwnCalendar) == Permission.OwnCalendar)
+                        permissions &= ~Permission.OwnCalendar;
+                    else
+                        permissions |= Permission.OwnCalendar;
+                    break;
+                case Permission.CommonCalendar:
+                    if ((permissions & Permission.CommonCalendar) == Permission.CommonCalendar)
+                        permissions &= ~Permission.CommonCalendar;
+                    else
+                        permissions |= Permission.CommonCalendar;
+                    break;
+                case Permission.Authorizating:
+                    if ((permissions & Permission.Authorizating) == Permission.Authorizating)
+                        permissions &= ~Permission.Authorizating;
+                    else
+                        permissions |= Permission.Authorizating;
+                    break;
+                case Permission.GivingPermissions:
+                    if ((permissions & Permission.GivingPermissions) == Permission.GivingPermissions)
+                        permissions &= ~Permission.GivingPermissions;
+                    else
+                        permissions |= Permission.GivingPermissions;
+                    break;
+                default:
+                    break;
+            }
+            managedUser.Permissions = (int)permissions;
+            UserHandler.UpdateUser(managedUser);
+            List<List<InlineKeyboardButton>> keyboardButtons = new List<List<InlineKeyboardButton>>
+            {
+                new List<InlineKeyboardButton>(){ new InlineKeyboardButton($"{MessageConst.PermissionView} - {((((Permission)managedUser.Permissions & Permission.View) == Permission.View) ? "так" : "ні")}") { CallbackData = $"{CallbackConst.ChangePermission} {(int)Permission.View} {managedUser.ChatId}" } },
+                new List<InlineKeyboardButton>(){ new InlineKeyboardButton($"{MessageConst.PermissionOwnCalendar} - {((((Permission)managedUser.Permissions & Permission.OwnCalendar) == Permission.OwnCalendar) ? "так" : "ні")}") { CallbackData = $"{CallbackConst.ChangePermission} {(int)Permission.OwnCalendar} {managedUser.ChatId}" } },
+                new List<InlineKeyboardButton>(){ new InlineKeyboardButton($"{MessageConst.PermissionCommonCalendar} - {((((Permission)managedUser.Permissions & Permission.CommonCalendar) == Permission.CommonCalendar) ? "так" : "ні")}") { CallbackData = $"{CallbackConst.ChangePermission} {(int)Permission.CommonCalendar} {managedUser.ChatId}" } },
+                new List<InlineKeyboardButton>(){ new InlineKeyboardButton($"{MessageConst.PermissionAuthorizating} - {((((Permission)managedUser.Permissions & Permission.Authorizating) == Permission.Authorizating) ? "так" : "ні")}") { CallbackData = $"{CallbackConst.ChangePermission} {(int)Permission.Authorizating} {managedUser.ChatId}" } },
+                new List<InlineKeyboardButton>(){ new InlineKeyboardButton($"{MessageConst.PermissionGivingPermissions} - {((((Permission)managedUser.Permissions & Permission.GivingPermissions) == Permission.GivingPermissions) ? "так" : "ні")}") { CallbackData = $"{CallbackConst.ChangePermission} {(int)Permission.GivingPermissions} {managedUser.ChatId}" } }
+            };
+            await botClient.EditMessageReplyMarkupAsync(user.ChatId, callbackQuery.Message.MessageId, replyMarkup: new InlineKeyboardMarkup(keyboardButtons));
+
         }
         #endregion
     }

@@ -15,6 +15,14 @@
         public const string Start = "/start";
         public const string Authentication = "/authentication";
         public const string Commands = "/commands";
+        public const string ManagePermissions = "/managePermissions";
+
+        //permissions
+        public const string PermissionView = "Перегляд календаря";
+        public const string PermissionOwnCalendar = "Керування своїми подіями";
+        public const string PermissionCommonCalendar = "Керування загальними подіями";
+        public const string PermissionAuthorizating = "Керування авторизацією";
+        public const string PermissionGivingPermissions = "Керування повноваженнями";
 
         //reply
         public const string YouAreNotAuthorized = "Ви не авторизовані";
@@ -28,6 +36,10 @@
         public const string ChoseAction = "Оберіть дію";
         public const string UnknownMessage = "Невідоме повідомлення\nДля початкового меню напишіть команду /start";
         public const string YouAddedEventOn = "Ви додали подію на";
+        public const string NoAuthenticationRequests = "Запитів на авторизацію нема";
+        public const string NoUsersExist = "Користувачів не існує";
+        public const string ChangePermissions = "Змінити повноваження";
+
         public static string UserHaveBeenAuthorized(string username) => $"Користувача @{username} авторизовано";
 
     }

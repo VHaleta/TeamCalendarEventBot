@@ -122,5 +122,13 @@ namespace TeamCalendarEventBot.Services
         {
             return _allUsers.FirstOrDefault(x => x.ChatId == chatId);
         }
+
+        public static List<UserBot> GetAllUsersExceptMe(UserBot user)
+        {
+            List<UserBot> result = new List<UserBot>();
+            result.AddRange(_allUsers);
+            result.Remove(user);
+            return result;
+        }
     }
 }

@@ -7,5 +7,7 @@
         public const string GetEvents = "getEvents";
         public const string Adding = "adding";
         public const string Authentication = "authentication";
+        public const string ManagePermissions = "managePermissions";
+        public const string ChangePermission = "changePermission";
     }
 }
