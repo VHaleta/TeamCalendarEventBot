@@ -27,6 +27,14 @@ namespace TeamCalendarEventBot.Services
             return GetCalendarInlineKeyboardMarkup(date, days, prev);
         }
 
+        public static InlineKeyboardMarkup GetEditEventKeyboard(DateTime date)
+        {
+            List<List<string>> days;
+            string prev = CallbackConst.EditEvent;
+            Days(date, out days);
+            return GetCalendarInlineKeyboardMarkup(date, days, prev);
+        }
+
         private static void Days(DateTime date, out List<List<string>> days)
         {
             int firstDay = 1, day = 1, daysInMonth;

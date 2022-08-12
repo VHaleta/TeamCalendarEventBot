@@ -7,10 +7,11 @@
         public const string Calendar = "Календар";
         public const string AddEventForAll = "Додати подію(для всіх)";
         public const string OnWeekEvents = "Події на тиждень";
-        public const string EditEvent = "Редагувати події";
+        public const string EditEvents = "Редагувати події";
         public const string AddEventForMe = "Додати подію(для себе)";
         public const string CheckAuthenticationRequests = "Переверити запити на авторизацію";
         public const string ManagePermissions = "Керування дозволами";
+        public const string Delete = "Видалити";
 
         //commands
         public const string StartCommand = "/start";
@@ -40,6 +41,7 @@
         public const string NoAuthenticationRequests = "Запитів на авторизацію нема";
         public const string NoUsersExist = "Користувачів не існує";
         public const string ChangePermissions = "Змінити повноваження";
+        public const string EventHasBeenDeleted = "Подію видалено";
 
         public static string UserHaveBeenAuthorized(string username) => $"Користувача @{username} авторизовано";
 

@@ -47,7 +47,7 @@ namespace TeamCalendarEventBot.Services
                 buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.AddEventForAll) });
 
             if (((permission & Permission.OwnCalendar) == Permission.OwnCalendar) || ((permission & Permission.CommonCalendar) == Permission.CommonCalendar))
-                buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.EditEvent) });
+                buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.EditEvents) });
 
             buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.BackToMainMenu) });
 

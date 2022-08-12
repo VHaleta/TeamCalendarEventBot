@@ -9,5 +9,7 @@
         public const string Authentication = "authentication";
         public const string ManagePermissions = "managePermissions";
         public const string ChangePermission = "changePermission";
+        public const string DeleteEvent = "deleteEvent";
+        public const string EditEvent = "editEvent";
     }
 }
