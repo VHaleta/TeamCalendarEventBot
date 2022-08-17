@@ -26,7 +26,7 @@ namespace TeamCalendarEventBot.Services
 
         public static async Task ShowCalendarEventsByDateAsync(ITelegramBotClient botClient, DateTime date, UserBot user)
         {
-            string result = $"<b>{MessageConst.EventsOn}</b> {date.ToString("dd.MM.yyyy")}\n\n";
+            string result = $"{MessageConst.EventsOn} {date.ToString("dd.MM.yyyy")}:\n\n";
             var foundEvents = _allGeneralEvents.Where(x => x.Date == date);
             foreach (var item in foundEvents)
             {
@@ -45,7 +45,7 @@ namespace TeamCalendarEventBot.Services
             {
                 DateTime tempDate = new DateTime(date.Year, date.Month, i);
                 var foundEvents = _allGeneralEvents.Where(x => x.Date == tempDate);
-                if (foundEvents.Any()) result += $"\nНа {DateConverter.EngToRusDay(tempDate.DayOfWeek.ToString())}\n";
+                if (foundEvents.Any()) result += $"\nНа {DateConverter.EngToRusDay(tempDate.DayOfWeek.ToString())}:\n";
                 foreach (var item in foundEvents)
                 {
                     result += $"● {item.Text}\n";

@@ -9,7 +9,7 @@
         public const string OnWeekEvents = "Події на тиждень";
         public const string EditEvents = "Редагувати події";
         public const string AddEventForMe = "Додати подію(для себе)";
-        public const string CheckAuthenticationRequests = "Переверити запити на авторизацію";
+        public const string CheckAuthenticationRequests = "Перевірити запити на авторизацію";
         public const string ManagePermissions = "Керування дозволами";
         public const string Delete = "Видалити";
 
