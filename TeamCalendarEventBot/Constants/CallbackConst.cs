@@ -11,5 +11,9 @@
         public const string ChangePermission = "changePermission";
         public const string DeleteEvent = "deleteEvent";
         public const string EditEvent = "editEvent";
+        public const string AddEventType = "addEventType";
+        public const string AddNotification = "addNotification";
+        public const string AddEventToCommonCalendar = "addEventToCommonCalendar";
+        public const string CanselAdding = "canselAdding";
     }
 }

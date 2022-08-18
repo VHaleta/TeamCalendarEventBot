@@ -27,7 +27,7 @@ namespace TeamCalendarEventBot.Services
         public static async Task ShowCalendarEventsByDateAsync(ITelegramBotClient botClient, DateTime date, UserBot user)
         {
             string result = $"{MessageConst.EventsOn} {date.ToString("dd.MM.yyyy")}:\n\n";
-            var foundEvents = _allGeneralEvents.Where(x => x.Date == date);
+            var foundEvents = _allGeneralEvents.Where(x => x.Date == date && x.IsActive == true);
             foreach (var item in foundEvents)
             {
                 result += $"● {item.Text}\n";
@@ -44,7 +44,7 @@ namespace TeamCalendarEventBot.Services
             for (int i = date.Day - dayOfWeek + 1; i <= date.Day + 7 - dayOfWeek; i++)
             {
                 DateTime tempDate = new DateTime(date.Year, date.Month, i);
-                var foundEvents = _allGeneralEvents.Where(x => x.Date == tempDate);
+                var foundEvents = _allGeneralEvents.Where(x => x.Date == tempDate && x.IsActive == true);
                 if (foundEvents.Any()) result += $"\nНа {DateConverter.EngToRusDay(tempDate.DayOfWeek.ToString())}:\n";
                 foreach (var item in foundEvents)
                 {
@@ -58,13 +58,13 @@ namespace TeamCalendarEventBot.Services
 
         public static int CountCalendarEventsByDate(DateTime date)
         {
-            var foundEvents = _allGeneralEvents.Where(x => x.Date == date);
+            var foundEvents = _allGeneralEvents.Where(x => x.Date == date && x.IsActive == true);
             return foundEvents.Count();
         }
 
         public static async Task EditCalendarEventsByDateAsync(ITelegramBotClient botClient, DateTime date, UserBot user)
         {
-            var foundEvents = _allGeneralEvents.Where(x => x.Date == date);
+            var foundEvents = _allGeneralEvents.Where(x => x.Date == date && x.IsActive == true);
             List<InlineKeyboardButton> keyboardButtons;
             foreach (var item in foundEvents)
             {
@@ -84,8 +84,6 @@ namespace TeamCalendarEventBot.Services
             _dataProvider.AddGeneralEvent(calendarEvent);
         }
 
-        
-
         public static void DeleteGeneralEvent(Guid ID)
         {
             var foundEvent = _allGeneralEvents.FirstOrDefault(x => x.Id == ID);
@@ -99,6 +97,23 @@ namespace TeamCalendarEventBot.Services
         {
             _allGeneralEvents.Remove(calendarEvent);
             _dataProvider.DeleteGeneralEvent(calendarEvent);
+        }
+
+        public static CalendarEvent FindEvent(Guid eventId)
+        {
+            var foundEvent = _allGeneralEvents.FirstOrDefault(x => x.Id == eventId);
+            return foundEvent;
+        }
+
+        public static void EditEvent(CalendarEvent calendarEvent)
+        {
+            var foundEvent = _allGeneralEvents.FirstOrDefault(x => x.Id == calendarEvent.Id);
+            if (foundEvent == null)
+                return;
+            _allGeneralEvents.Remove(foundEvent);
+            _dataProvider.DeleteGeneralEvent(foundEvent);
+            _allGeneralEvents.Add(calendarEvent);
+            _dataProvider.AddGeneralEvent(calendarEvent);
         }
     }
 }

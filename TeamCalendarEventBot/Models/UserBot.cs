@@ -1,4 +1,5 @@
-﻿using TeamCalendarEventBot.Constants;
+﻿using System;
+using TeamCalendarEventBot.Constants;
 
 namespace TeamCalendarEventBot.Models
 {
@@ -11,6 +12,6 @@ namespace TeamCalendarEventBot.Models
         public AuthenticationState Auth { get; set; }
         public UserStatus UserStatus { get; set; }
         public MenuStage MenuStage { get; set; }
-        public CalendarEvent TempCalendarEvent { get; set; }
+        public DateTime TempDate { get; set; }
     }
 }

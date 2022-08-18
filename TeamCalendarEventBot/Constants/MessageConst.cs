@@ -26,6 +26,21 @@
         public const string PermissionAuthorizating = "Керування авторизацією";
         public const string PermissionGivingPermissions = "Керування повноваженнями";
 
+        //event type
+        public const string ChoseEventType = "Оберіть тип події";
+        public const string EventType = "Тип події";
+        public const string EventTypeDefault = "Стандартний";
+        public const string EventTypeBirthday = "День народження";
+        public const string EventTypeDeadline = "Дедлайн";
+
+        //notification
+        public const string ChoseNotification = "Оберіть нагадування";
+        public const string NotificationInDay = "У цей день";
+        public const string NotificationForOneDay = "За 1 добу";
+        public const string NotificationForTwoDays = "За 2 доби";
+        public const string NotificationForAWeek = "За тиждень";
+        public const string NotificationNo = "Без нагадування";
+
         //reply
         public const string YouAreNotAuthorized = "Ви не авторизовані";
         public const string AuthenticationRequested = "Авторизація запрошена";
@@ -42,6 +57,8 @@
         public const string NoUsersExist = "Користувачів не існує";
         public const string ChangePermissions = "Змінити повноваження";
         public const string EventHasBeenDeleted = "Подію видалено";
+        public const string AddEventToCommonCalendar = "Додати подію до загального календарю";
+        public const string CanselAdding = "Відмінити додавання";
 
         public static string UserHaveBeenAuthorized(string username) => $"Користувача @{username} авторизовано";
 
