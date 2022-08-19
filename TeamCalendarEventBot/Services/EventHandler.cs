@@ -40,8 +40,7 @@ namespace TeamCalendarEventBot.Services
         public static async Task ShowCalendarEventsByWeekAsync(ITelegramBotClient botClient, DateTime date, UserBot user)
         {
             string result = "";
-            int dayOfWeek = (int)date.DayOfWeek;
-            for (int i = date.Day - dayOfWeek + 1; i <= date.Day + 7 - dayOfWeek; i++)
+            for (int i = date.Day; i <= date.Day + 7; i++)
             {
                 DateTime tempDate = new DateTime(date.Year, date.Month, i);
                 var foundEvents = _allGeneralEvents.Where(x => x.Date == tempDate && x.IsActive == true);

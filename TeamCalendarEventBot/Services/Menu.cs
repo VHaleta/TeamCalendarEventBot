@@ -40,14 +40,11 @@ namespace TeamCalendarEventBot.Services
             if ((permission & Permission.View) == Permission.View)
                 buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.OnWeekEvents) });
 
-            if ((permission & Permission.OwnCalendar) == Permission.OwnCalendar)
-                buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.AddEventForMe) });
-
-            if ((permission & Permission.CommonCalendar) == Permission.CommonCalendar)
-                buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.AddEventForAll) });
-
             if (((permission & Permission.OwnCalendar) == Permission.OwnCalendar) || ((permission & Permission.CommonCalendar) == Permission.CommonCalendar))
+            {
+                buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.AddEvent) });
                 buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.EditEvents) });
+            }
 
             buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.BackToMainMenu) });
 

@@ -5,19 +5,16 @@
         public const string JoinToBot = "Запросити авторизацію";
         public const string BackToMainMenu = "Повернутися до головного меню";
         public const string Calendar = "Календар";
-        public const string AddEventForAll = "Додати подію(для всіх)";
-        public const string OnWeekEvents = "Події на тиждень";
+        public const string AddEvent = "Додати подію";
+        public const string OnWeekEvents = "Події на 7 діб";
         public const string EditEvents = "Редагувати події";
-        public const string AddEventForMe = "Додати подію(для себе)";
         public const string CheckAuthenticationRequests = "Перевірити запити на авторизацію";
         public const string ManagePermissions = "Керування дозволами";
         public const string Delete = "Видалити";
 
         //commands
         public const string StartCommand = "/start";
-        public const string AuthenticationCommand = "/authentication";
-        public const string CommandsCommand = "/commands";
-        public const string ManagePermissionsCommand = "/managePermissions";
+        public const string RunNotifications = "/runNotifications";
 
         //permissions
         public const string PermissionView = "Перегляд календаря";
@@ -44,6 +41,7 @@
         //reply
         public const string YouAreNotAuthorized = "Ви не авторизовані";
         public const string AuthenticationRequested = "Авторизація запрошена";
+        public const string AuthenticationHaveBeenRequested = "Авторизація вже буза запрошена, зачекайте підтвердження";
         public const string YouHaveChosenDate = "Ви обрали дату";
         public const string WriteEventText = "Напишіть текст події";
         public const string YouHaveBeenAuthorized = "Вас було авторизовано";
@@ -58,7 +56,7 @@
         public const string ChangePermissions = "Змінити повноваження";
         public const string EventHasBeenDeleted = "Подію видалено";
         public const string AddEventToCommonCalendar = "Додати подію до загального календарю";
-        public const string CanselAdding = "Відмінити додавання";
+        public const string CancelAdding = "Відмінити додавання";
 
         public static string UserHaveBeenAuthorized(string username) => $"Користувача @{username} авторизовано";
 

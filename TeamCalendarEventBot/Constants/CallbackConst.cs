@@ -14,6 +14,6 @@
         public const string AddEventType = "addEventType";
         public const string AddNotification = "addNotification";
         public const string AddEventToCommonCalendar = "addEventToCommonCalendar";
-        public const string CanselAdding = "canselAdding";
+        public const string CancelAdding = "cancelAdding";
     }
 }

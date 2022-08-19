@@ -41,15 +41,13 @@ namespace TeamCalendarEventBot.Sevices
             {
                 //Commands
                 MessageConst.StartCommand => StartupMessageAsync(botClient, user),
-                MessageConst.AuthenticationCommand => AuthenticationMessageAsync(botClient, user),
-                MessageConst.CommandsCommand => CommandsCommandAsync(botClient, user),
-                MessageConst.ManagePermissionsCommand => ManagePermissionsMessageAsync(botClient, user),
+                MessageConst.RunNotifications => RunNotificationsCommand(botClient, user),
                 //Startapmenu
                 MessageConst.Calendar => CalendarMessageAsync(botClient, user),
                 MessageConst.CheckAuthenticationRequests => AuthenticationMessageAsync(botClient, user),
                 MessageConst.ManagePermissions => ManagePermissionsMessageAsync(botClient, user),
                 //CalendarMenu
-                MessageConst.AddEventForAll => AddEventForAllMessageAsync(botClient, user),
+                MessageConst.AddEvent => AddEventMessageAsync(botClient, user),
                 MessageConst.OnWeekEvents => OnWeekEventsMessageAsync(botClient, user),
                 MessageConst.EditEvents => EditEventsMessageAsync(botClient, user),
                 //General
@@ -70,7 +68,7 @@ namespace TeamCalendarEventBot.Sevices
             {
                 CallbackConst.ChangeMonth => ChangeMonthCallbackQueryAsync(botClient, callbackQuery, user, dataSplit),
                 CallbackConst.GetEvents => ShowCalendarEventsByDateCallbackQueryAsync(botClient, user, dataSplit),
-                CallbackConst.Adding => AddingEventCallbackQueryAsync(botClient, user, dataSplit),
+                CallbackConst.Adding => AddingEventCallbackQueryAsync(botClient, callbackQuery, user, dataSplit),
                 CallbackConst.Authentication => AuthenticateUserCallbackQueryAsync(botClient, user, dataSplit),
                 CallbackConst.ManagePermissions => ManagePermissionsCallbackQueryAsync(botClient, callbackQuery, user, dataSplit),
                 CallbackConst.ChangePermission => ChangePermissionCallbackQueryAsync(botClient, callbackQuery, user, dataSplit),
@@ -79,6 +77,7 @@ namespace TeamCalendarEventBot.Sevices
                 CallbackConst.AddEventType => AddEventTypeCallbackQueryAsync(botClient, callbackQuery, user, dataSplit),
                 CallbackConst.AddNotification => AddNotificationCallbackQueryAsync(botClient, callbackQuery, user, dataSplit),
                 CallbackConst.AddEventToCommonCalendar => AddEventToCommonCalendarAsync(botClient, callbackQuery, user, dataSplit),
+                CallbackConst.CancelAdding => CancelAddingCallbackQueryAsync(botClient, callbackQuery, user, dataSplit),
                 _ => UnknownCallbackQuery(botClient, user)
             };
             await action;
@@ -89,6 +88,11 @@ namespace TeamCalendarEventBot.Sevices
         #region Message
         private static async Task CalendarMessageAsync(ITelegramBotClient botClient, UserBot user)
         {
+            if (((Permission)user.Permissions & Permission.View) != Permission.View)
+            {
+                await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
+                return;
+            }
             await botClient.SendTextMessageAsync(user.ChatId, MessageConst.Calendar, replyMarkup: Calendar.GetCalendarKeyboard(DateTime.Today));
             await botClient.SendTextMessageAsync(user.ChatId, MessageConst.ChoseAction, replyMarkup: Menu.GetMenuButtons((Permission)user.Permissions, MenuStage.CalendarMenu));
         }
@@ -103,13 +107,23 @@ namespace TeamCalendarEventBot.Sevices
             await botClient.SendTextMessageAsync(user.ChatId, text: MessageConst.UnknownMessage);
         }
 
-        private static async Task AddEventForAllMessageAsync(ITelegramBotClient botClient, UserBot user)
+        private static async Task AddEventMessageAsync(ITelegramBotClient botClient, UserBot user)
         {
+            if ((((Permission)user.Permissions & Permission.CommonCalendar) != Permission.CommonCalendar) || ((Permission)user.Permissions & Permission.OwnCalendar) != Permission.OwnCalendar)
+            {
+                await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
+                return;
+            }
             await botClient.SendTextMessageAsync(user.ChatId, MessageConst.Calendar, replyMarkup: Calendar.GetAddingEventKetboard(DateTime.Today));
         }
 
         private static async Task OnWeekEventsMessageAsync(ITelegramBotClient botClient, UserBot user)
         {
+            if (((Permission)user.Permissions & Permission.View) != Permission.View)
+            {
+                await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
+                return;
+            }
             await Services.EventHandler.ShowCalendarEventsByWeekAsync(botClient, DateTime.Today, user);
         }
 
@@ -117,10 +131,10 @@ namespace TeamCalendarEventBot.Sevices
         {
             CalendarEvent tempEvent = new CalendarEvent() { Date = user.TempDate, Text = message };
             await Services.EventHandler.AddGeneralEventAsync(botClient, user, tempEvent);
-            List<InlineKeyboardButton> keyboardButtons = new List<InlineKeyboardButton> {
-                    new InlineKeyboardButton(MessageConst.EventTypeDefault) { CallbackData = $"{CallbackConst.AddEventType} {(int)CalendarEventType.Default} {tempEvent.Id}"},
-                    new InlineKeyboardButton(MessageConst.EventTypeBirthday) { CallbackData = $"{CallbackConst.AddEventType} {(int)CalendarEventType.Birthday} {tempEvent.Id}"},
-                    new InlineKeyboardButton(MessageConst.EventTypeDeadline) { CallbackData = $"{CallbackConst.AddEventType} {(int)CalendarEventType.Deadline} {tempEvent.Id}"},
+            List<List<InlineKeyboardButton>> keyboardButtons = new List<List<InlineKeyboardButton>> {
+                new List<InlineKeyboardButton>(){ new InlineKeyboardButton(MessageConst.EventTypeDefault) { CallbackData = $"{CallbackConst.AddEventType} {(int)CalendarEventType.Default} {tempEvent.Id}"}, new InlineKeyboardButton(MessageConst.EventTypeDeadline) { CallbackData = $"{CallbackConst.AddEventType} {(int)CalendarEventType.Deadline} {tempEvent.Id}"} },
+                new List<InlineKeyboardButton>(){ new InlineKeyboardButton(MessageConst.EventTypeBirthday) { CallbackData = $"{CallbackConst.AddEventType} {(int)CalendarEventType.Birthday} {tempEvent.Id}"} },
+                new List<InlineKeyboardButton>(){ new InlineKeyboardButton(MessageConst.CancelAdding) { CallbackData = $"{CallbackConst.CancelAdding} {tempEvent.Id}" } }
             };
             await botClient.SendTextMessageAsync(user.ChatId, $"{tempEvent.Date.ToString("dd.MM.yyyy")}\n{tempEvent.Text}\n\n{MessageConst.ChoseEventType}:", replyMarkup: new InlineKeyboardMarkup(keyboardButtons));
             user.UserStatus = UserStatus.None;
@@ -143,11 +157,6 @@ namespace TeamCalendarEventBot.Sevices
                 await botClient.SendTextMessageAsync(user.ChatId, $"@{item.Username}", replyMarkup: new InlineKeyboardMarkup(keyboardButtons));
             }
         }
-        private static async Task CommandsCommandAsync(ITelegramBotClient botClient, UserBot user)
-        {
-            await botClient.SendTextMessageAsync(user.ChatId, $"{MessageConst.StartCommand}\n{MessageConst.CommandsCommand}\n{MessageConst.AuthenticationCommand}\n{MessageConst.ManagePermissionsCommand}");
-        }
-
         private static async Task ManagePermissionsMessageAsync(ITelegramBotClient botClient, UserBot user)
         {
             if (((Permission)user.Permissions & Permission.GivingPermissions) != Permission.GivingPermissions)
@@ -168,12 +177,18 @@ namespace TeamCalendarEventBot.Sevices
 
         private static async Task EditEventsMessageAsync(ITelegramBotClient botClient, UserBot user)
         {
-            if (((Permission)user.Permissions & Permission.CommonCalendar) != Permission.CommonCalendar)
+            if ((((Permission)user.Permissions & Permission.CommonCalendar) != Permission.CommonCalendar) || ((Permission)user.Permissions & Permission.OwnCalendar) != Permission.OwnCalendar)
             {
                 await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
                 return;
             }
             await botClient.SendTextMessageAsync(user.ChatId, MessageConst.Calendar, replyMarkup: Calendar.GetEditEventKeyboard(DateTime.Today));
+        }
+
+        private static Task RunNotificationsCommand(ITelegramBotClient botClient, UserBot user)
+        {
+            NotificationHandler.StartNotifications(botClient);
+            return Task.CompletedTask;
         }
         #endregion
 
@@ -200,7 +215,7 @@ namespace TeamCalendarEventBot.Sevices
             await Services.EventHandler.ShowCalendarEventsByDateAsync(botClient, date, user);
         }
 
-        private static async Task AddingEventCallbackQueryAsync(ITelegramBotClient botClient, UserBot user, string[] dataSplit)
+        private static async Task AddingEventCallbackQueryAsync(ITelegramBotClient botClient, CallbackQuery callbackQuery, UserBot user, string[] dataSplit)
         {
             DateTime date;
             if (!DateTime.TryParse(dataSplit[1], out date))
@@ -210,7 +225,8 @@ namespace TeamCalendarEventBot.Sevices
             }
             user.UserStatus = UserStatus.Adding;
             user.TempDate = date;
-            await botClient.SendTextMessageAsync(user.ChatId, $"{MessageConst.YouHaveChosenDate}: {date.ToString("dd.MM.yyyy")}\n{MessageConst.WriteEventText}:");
+            List<InlineKeyboardButton> keyboardButtons = new List<InlineKeyboardButton>();
+            await botClient.EditMessageTextAsync(user.ChatId, callbackQuery.Message.MessageId, $"{MessageConst.YouHaveChosenDate}: {date.ToString("dd.MM.yyyy")}\n{MessageConst.WriteEventText}:", replyMarkup: new InlineKeyboardMarkup(keyboardButtons));
             UserHandler.UpdateUser(user);
         }
 
@@ -346,12 +362,14 @@ namespace TeamCalendarEventBot.Sevices
                 return;
             }
             Guid Id;
-            if (Guid.TryParse(dataSplit[1], out Id))
+            if (!Guid.TryParse(dataSplit[1], out Id))
             {
-                Services.EventHandler.DeleteGeneralEvent(Id);
-                await botClient.EditMessageTextAsync(user.ChatId, callbackQuery.Message.MessageId, MessageConst.EventHasBeenDeleted);
-                await botClient.EditMessageReplyMarkupAsync(user.ChatId, callbackQuery.Message.MessageId);
+                Console.WriteLine($"Wrong format of event id: {dataSplit[1]}");
+                return;
             }
+            Services.EventHandler.DeleteGeneralEvent(Id);
+            List<InlineKeyboardButton> keyboardButtons = new List<InlineKeyboardButton>();
+            await botClient.EditMessageTextAsync(user.ChatId, callbackQuery.Message.MessageId, MessageConst.EventHasBeenDeleted, replyMarkup: new InlineKeyboardMarkup(keyboardButtons));
 
         }
 
@@ -405,7 +423,9 @@ namespace TeamCalendarEventBot.Sevices
                 new List<InlineKeyboardButton>(){ new InlineKeyboardButton(MessageConst.NotificationForOneDay) { CallbackData = $"{CallbackConst.AddNotification} {(int)NotificationConst.ForOneDay} {tempEvent.Id}" },  new InlineKeyboardButton(MessageConst.NotificationForTwoDays) { CallbackData = $"{CallbackConst.AddNotification} {(int)NotificationConst.ForTwoDays} {tempEvent.Id}" }},
                 new List<InlineKeyboardButton>(){ new InlineKeyboardButton(MessageConst.NotificationForAWeek) { CallbackData = $"{CallbackConst.AddNotification} {(int)NotificationConst.ForAWeek} {tempEvent.Id}" } },
                 new List<InlineKeyboardButton>(){ new InlineKeyboardButton(MessageConst.NotificationInDay) { CallbackData = $"{CallbackConst.AddNotification} {(int)NotificationConst.InDay} {tempEvent.Id}" } },
-                new List<InlineKeyboardButton>(){ new InlineKeyboardButton(MessageConst.NotificationNo) { CallbackData = $"{CallbackConst.AddNotification} {(int)NotificationConst.No} {tempEvent.Id}" } }
+                new List<InlineKeyboardButton>(){ new InlineKeyboardButton(MessageConst.NotificationNo) { CallbackData = $"{CallbackConst.AddNotification} {(int)NotificationConst.No} {tempEvent.Id}" } },
+                new List<InlineKeyboardButton>(){new InlineKeyboardButton(MessageConst.CancelAdding) { CallbackData = $"{CallbackConst.CancelAdding} {tempEvent.Id}" } }
+
             };
             await botClient.EditMessageTextAsync(user.ChatId, callbackQuery.Message.MessageId, $"{tempEvent.Date.ToString("dd.MM.yyyy")}\n{tempEvent.Text}\n{MessageConst.EventType}: {tempEvent.Type}\n\n{MessageConst.ChoseNotification}:", replyMarkup: new InlineKeyboardMarkup(keyboardButtons));
         }
@@ -435,7 +455,7 @@ namespace TeamCalendarEventBot.Sevices
             List<List<InlineKeyboardButton>> keyboardButtons = new List<List<InlineKeyboardButton>>
             {
                 new List<InlineKeyboardButton>(){new InlineKeyboardButton(MessageConst.AddEventToCommonCalendar) { CallbackData = $"{CallbackConst.AddEventToCommonCalendar} {tempEvent.Id}" } },
-                new List<InlineKeyboardButton>(){new InlineKeyboardButton(MessageConst.CanselAdding) { CallbackData = $"{CallbackConst.CanselAdding} {tempEvent.Id}" } }
+                new List<InlineKeyboardButton>(){new InlineKeyboardButton(MessageConst.CancelAdding) { CallbackData = $"{CallbackConst.CancelAdding} {tempEvent.Id}" } }
             };
             await botClient.EditMessageTextAsync(user.ChatId, callbackQuery.Message.MessageId, $"{tempEvent.Date.ToString("dd.MM.yyyy")}\n{tempEvent.Text}\n{MessageConst.EventType}: {tempEvent.Type}\n{tempEvent.Notification}", replyMarkup: new InlineKeyboardMarkup(keyboardButtons));
         }
@@ -459,6 +479,23 @@ namespace TeamCalendarEventBot.Sevices
             Services.EventHandler.EditEvent(tempEvent);
             List<InlineKeyboardButton> keyboardButtons = new List<InlineKeyboardButton>();
             await botClient.EditMessageTextAsync(user.ChatId, callbackQuery.Message.MessageId, $"{MessageConst.YouAddedEventOn} {tempEvent.Date.ToString("dd.MM.yyyy")}\n{tempEvent.Text}\n{MessageConst.EventType}: {tempEvent.Type}\n{tempEvent.Notification}", replyMarkup: new InlineKeyboardMarkup(keyboardButtons));
+        }
+        private static async Task CancelAddingCallbackQueryAsync(ITelegramBotClient botClient, CallbackQuery callbackQuery, UserBot user, string[] dataSplit)
+        {
+            if (((Permission)user.Permissions & Permission.CommonCalendar) != Permission.CommonCalendar)
+            {
+                await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
+                return;
+            }
+            Guid eventId;
+            if (!Guid.TryParse(dataSplit[1], out eventId))
+            {
+                Console.WriteLine($"Wrong format of event id: {dataSplit[1]}");
+                return;
+            }
+            Services.EventHandler.DeleteGeneralEvent(eventId);
+            List<InlineKeyboardButton> keyboardButtons = new List<InlineKeyboardButton>();
+            await botClient.EditMessageTextAsync(user.ChatId, callbackQuery.Message.MessageId, MessageConst.EventHasBeenDeleted, replyMarkup: new InlineKeyboardMarkup(keyboardButtons));
         }
         #endregion
     }

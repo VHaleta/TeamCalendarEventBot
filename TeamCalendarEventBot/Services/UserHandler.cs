@@ -34,17 +34,18 @@ namespace TeamCalendarEventBot.Services
                 if (message.Text == MessageConst.JoinToBot)
                 {
                     user.Auth = AuthenticationState.Requested;
+                    await botClient.SendTextMessageAsync(chatId: user.ChatId, MessageConst.AuthenticationRequested, replyMarkup: Menu.NoneAuthKeybord());
                     _dataProvider.UpsertUser(user);
                 }
                 else
                 {
-                    _ = await botClient.SendTextMessageAsync(chatId: user.ChatId, MessageConst.YouAreNotAuthorized, replyMarkup: Menu.NoneAuthKeybord());
+                    await botClient.SendTextMessageAsync(chatId: user.ChatId, MessageConst.YouAreNotAuthorized, replyMarkup: Menu.NoneAuthKeybord());
                 }
             }
 
             if (user.Auth == AuthenticationState.Requested)
             {
-                _ = await botClient.SendTextMessageAsync(chatId: user.ChatId, MessageConst.YouAreNotAuthorized, replyMarkup: Menu.NoneAuthKeybord());
+                await botClient.SendTextMessageAsync(chatId: user.ChatId, MessageConst.AuthenticationHaveBeenRequested, replyMarkup: Menu.NoneAuthKeybord());
             }
 
             return false;
