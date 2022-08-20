@@ -12,8 +12,9 @@
         public const string DeleteEvent = "deleteEvent";
         public const string EditEvent = "editEvent";
         public const string AddEventType = "addEventType";
-        public const string AddNotification = "addNotification";
+        public const string ChangeNotification = "changeNotification";
         public const string AddEventToCommonCalendar = "addEventToCommonCalendar";
         public const string CancelAdding = "cancelAdding";
+        public const string GoToFinalAddingStage = "goToFinalAddingStage";
     }
 }

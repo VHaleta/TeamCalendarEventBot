@@ -57,6 +57,10 @@
         public const string EventHasBeenDeleted = "Подію видалено";
         public const string AddEventToCommonCalendar = "Додати подію до загального календарю";
         public const string CancelAdding = "Відмінити додавання";
+        public const string Yes = "так";
+        public const string No = "ні";
+        public const string Next = "Далі";
+
 
         public static string UserHaveBeenAuthorized(string username) => $"Користувача @{username} авторизовано";
 

@@ -131,5 +131,13 @@ namespace TeamCalendarEventBot.Services
             result.Remove(user);
             return result;
         }
+
+        public static async void SendAllUsers(ITelegramBotClient botClient, string messageText)
+        {
+            foreach (var user in _allUsers)
+            {
+                await botClient.SendTextMessageAsync(user.ChatId, messageText);
+            }
+        }
     }
 }

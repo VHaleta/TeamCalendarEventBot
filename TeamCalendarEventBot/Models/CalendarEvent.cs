@@ -11,7 +11,7 @@ namespace TeamCalendarEventBot.Models
         public Guid Id { get; set; }
         public DateTime Date { get; set; }
         public CalendarEventType Type { get; set; }
-        public NotificationConst Notification { get; set; }
+        public int Notifications { get; set; }
         public string Text { get; set; }
         public bool IsActive { get; set; }
     }

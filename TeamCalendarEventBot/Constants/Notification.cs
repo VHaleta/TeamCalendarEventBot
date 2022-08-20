@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 
 namespace TeamCalendarEventBot.Constants
 {
-    public enum NotificationConst
+    [Flags]
+    public enum Notification
     {
-        InDay,
-        ForOneDay,
-        ForTwoDays,
-        ForAWeek,
-        No
+        No = 0,
+        InDay = 1,
+        ForOneDay = 2,
+        ForTwoDays = 4,
+        ForAWeek = 8,
     }
 }

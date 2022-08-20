@@ -114,5 +114,11 @@ namespace TeamCalendarEventBot.Services
             _allGeneralEvents.Add(calendarEvent);
             _dataProvider.AddGeneralEvent(calendarEvent);
         }
+
+        public static List<CalendarEvent> GetCalendarEventsForNotification()
+        {
+            var calendarEvents = _allGeneralEvents.Where(x => x.IsActive == true && x.Notifications > 0 && x.Date >= DateTime.Today);
+            return calendarEvents.ToList();
+        }
     }
 }
