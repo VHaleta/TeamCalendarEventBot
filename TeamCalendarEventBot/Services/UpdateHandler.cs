@@ -46,6 +46,7 @@ namespace TeamCalendarEventBot.Sevices
                 MessageConst.Calendar => CalendarMessageAsync(botClient, user),
                 MessageConst.CheckAuthenticationRequests => AuthenticationMessageAsync(botClient, user),
                 MessageConst.ManagePermissions => ManagePermissionsMessageAsync(botClient, user),
+                MessageConst.GettingNotifications => GettingNotificationsMessageAsync(botClient, user),
                 //CalendarMenu
                 MessageConst.AddEvent => AddEventMessageAsync(botClient, user),
                 MessageConst.OnWeekEvents => OnWeekEventsMessageAsync(botClient, user),
@@ -79,11 +80,11 @@ namespace TeamCalendarEventBot.Sevices
                 CallbackConst.AddEventToCommonCalendar => AddEventToCommonCalendarAsync(botClient, callbackQuery, user, dataSplit),
                 CallbackConst.CancelAdding => CancelAddingCallbackQueryAsync(botClient, callbackQuery, user, dataSplit),
                 CallbackConst.GoToFinalAddingStage => GoToFinalAddingStageCallbackQueryAsync(botClient, callbackQuery, user, dataSplit),
+                CallbackConst.ChangeMyNotificationStatus => ChangeMyNotificationStatusCallbackQueryAsync(botClient, user, dataSplit),
                 _ => UnknownCallbackQuery(botClient, user)
             };
             await action;
         }
-
         #endregion
 
         #region Message
@@ -190,6 +191,19 @@ namespace TeamCalendarEventBot.Sevices
         {
             NotificationHandler.StartNotifications(botClient);
             return Task.CompletedTask;
+        }
+
+        private static async Task GettingNotificationsMessageAsync(ITelegramBotClient botClient, UserBot user)
+        {
+            if (((Permission)user.Permissions & Permission.View) != Permission.View)
+            {
+                await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
+                return;
+            }
+            List<InlineKeyboardButton> keyboardButtons = new List<InlineKeyboardButton> {
+                    new InlineKeyboardButton(MessageConst.Yes) { CallbackData = $"{CallbackConst.ChangeMyNotificationStatus} {1} {user.ChatId}"},
+                    new InlineKeyboardButton(MessageConst.No) { CallbackData = $"{CallbackConst.ChangeMyNotificationStatus} {0} {user.ChatId}"}};
+            await botClient.SendTextMessageAsync(user.ChatId, MessageConst.DoesGetNotifications, replyMarkup: new InlineKeyboardMarkup(keyboardButtons));
         }
         #endregion
 
@@ -557,6 +571,31 @@ namespace TeamCalendarEventBot.Sevices
             };
             await botClient.EditMessageTextAsync(user.ChatId, callbackQuery.Message.MessageId, $"{tempEvent.Date.ToString("dd.MM.yyyy")}\n{tempEvent.Text}\n{MessageConst.EventType}: {tempEvent.Type}", replyMarkup: new InlineKeyboardMarkup(keyboardButtons));
 
+        }
+
+        private static async Task ChangeMyNotificationStatusCallbackQueryAsync(ITelegramBotClient botClient, UserBot user, string[] dataSplit)
+        {
+            if (((Permission)user.Permissions & Permission.View) != Permission.View)
+            {
+                await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
+                return;
+            }
+            int status;
+            if (!int.TryParse(dataSplit[1], out status))
+            {
+                Console.WriteLine($"Wrong format of status: {dataSplit[1]}");
+                return;
+            }
+            long chatId;
+            if (!long.TryParse(dataSplit[2], out chatId))
+            {
+                Console.WriteLine($"Wrong format of chat id: {dataSplit[1]}");
+                return;
+            }
+            UserBot managedUser = UserHandler.FindUser(chatId);
+            managedUser.GetNotification = Convert.ToBoolean(status);
+            UserHandler.UpdateUser(managedUser);
+            await botClient.SendTextMessageAsync(user.ChatId, $"{(managedUser.GetNotification ? MessageConst.NowYouAreGettingNotifications : MessageConst.NowYouAreNotGettingNotifications)}");
         }
         #endregion
     }

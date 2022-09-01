@@ -16,5 +16,6 @@
         public const string AddEventToCommonCalendar = "addEventToCommonCalendar";
         public const string CancelAdding = "cancelAdding";
         public const string GoToFinalAddingStage = "goToFinalAddingStage";
+        public const string ChangeMyNotificationStatus = "changeMyNotificationStatus";
     }
 }

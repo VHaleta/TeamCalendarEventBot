@@ -132,12 +132,21 @@ namespace TeamCalendarEventBot.Services
             return result;
         }
 
-        public static async void SendAllUsers(ITelegramBotClient botClient, string messageText)
+        public static async Task SendAllUsers(ITelegramBotClient botClient, string messageText)
         {
             foreach (var user in _allUsers)
             {
                 await botClient.SendTextMessageAsync(user.ChatId, messageText);
             }
         }
+
+        public static async Task SendAllNotificatedUsers(ITelegramBotClient botClient, string messageText)
+        {
+            var notificatedUsers = _allUsers.FindAll(x => x.GetNotification == true);
+            foreach (var user in notificatedUsers)
+            {
+                await botClient.SendTextMessageAsync(user.ChatId, messageText);
+            }
+        } 
     }
 }

@@ -70,7 +70,7 @@ namespace TeamCalendarEventBot.Services
             if (doesForAWeek)
                 result = "Події через тиждень:\n" + forAWeek + "\n";
             if (result != "" && result != null)
-                await bot.SendTextMessageAsync(500661841, result);
+                await UserHandler.SendAllNotificatedUsers(bot, result);
         }
 
         public static void StartNotifications(ITelegramBotClient botClient)

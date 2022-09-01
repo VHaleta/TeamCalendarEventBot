@@ -9,6 +9,7 @@ namespace TeamCalendarEventBot.Models
         public string Username { get; set; }
         public int Permissions { get; set; }
         public bool Active { get; set; }
+        public bool GetNotification { get; set; }
         public AuthenticationState Auth { get; set; }
         public UserStatus UserStatus { get; set; }
         public MenuStage MenuStage { get; set; }

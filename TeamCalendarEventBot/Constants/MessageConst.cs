@@ -11,6 +11,8 @@
         public const string CheckAuthenticationRequests = "Перевірити запити на авторизацію";
         public const string ManagePermissions = "Керування дозволами";
         public const string Delete = "Видалити";
+        public const string GettingNotifications = "Отримування нагадувань";
+
 
         //commands
         public const string StartCommand = "/start";
@@ -60,7 +62,9 @@
         public const string Yes = "так";
         public const string No = "ні";
         public const string Next = "Далі";
-
+        public const string DoesGetNotifications = "Отримувати нагадування?";
+        public const string NowYouAreGettingNotifications = "Тепер ви отримуєте нагадування";
+        public const string NowYouAreNotGettingNotifications = "Тепер ви не отримуєте нагадування";
 
         public static string UserHaveBeenAuthorized(string username) => $"Користувача @{username} авторизовано";
 

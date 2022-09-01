@@ -58,7 +58,10 @@ namespace TeamCalendarEventBot.Services
             if ((permission & Permission.View) == Permission.View)
                 buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.Calendar) });
 
-            if((permission & Permission.Authorizating) == Permission.Authorizating)
+            if ((permission & Permission.View) == Permission.View)
+                buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.GettingNotifications) });
+
+            if ((permission & Permission.Authorizating) == Permission.Authorizating)
                 buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.CheckAuthenticationRequests) });
 
             if ((permission & Permission.GivingPermissions) == Permission.GivingPermissions)
