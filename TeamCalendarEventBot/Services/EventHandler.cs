@@ -27,13 +27,18 @@ namespace TeamCalendarEventBot.Services
         public static async Task ShowCalendarEventsByDateAsync(ITelegramBotClient botClient, DateTime date, UserBot user)
         {
             string result = $"{MessageConst.EventsOn} {date.ToString("dd.MM.yyyy")}:\n\n";
-            var foundEvents = _allGeneralEvents.Where(x => x.Date == date && x.IsActive == true);
+            var foundEvents = _allGeneralEvents.Where(x => x.Date == date && x.IsActive == true && x.Type != CalendarEventType.Birthday);
             foreach (var item in foundEvents)
             {
                 result += $"● {item.Text}\n";
             }
+            var birthdays = _allGeneralEvents.Where(x => x.Date.Day == date.Day && x.Date.Month == date.Month && x.Type == CalendarEventType.Birthday && x.IsActive == true);
+            foreach (var item in birthdays)
+            {
+                result += $"● {item.Text}\n";
+            }
 
-            if (!foundEvents.Any()) result += MessageConst.NoEvents;
+            if (!foundEvents.Any() && !birthdays.Any()) result += MessageConst.NoEvents;
             await botClient.SendTextMessageAsync(user.ChatId, result);
         }
 
@@ -43,9 +48,14 @@ namespace TeamCalendarEventBot.Services
             for (int i = date.Day; i <= date.Day + 7; i++)
             {
                 DateTime tempDate = new DateTime(date.Year, date.Month, i);
-                var foundEvents = _allGeneralEvents.Where(x => x.Date == tempDate && x.IsActive == true);
-                if (foundEvents.Any()) result += $"\nНа {DateConverter.EngToRusDay(tempDate.DayOfWeek.ToString())}:\n";
+                var foundEvents = _allGeneralEvents.Where(x => x.Date == tempDate && x.IsActive == true && x.Type != CalendarEventType.Birthday);
+                var birthdays = _allGeneralEvents.Where(x => x.Date.Day == tempDate.Day && x.Date.Month == tempDate.Month && x.Type == CalendarEventType.Birthday && x.IsActive == true);
+                if (foundEvents.Any() || birthdays.Any()) result += $"\nНа {DateConverter.EngToRusDay(tempDate.DayOfWeek.ToString())}:\n";
                 foreach (var item in foundEvents)
+                {
+                    result += $"● {item.Text}\n";
+                }
+                foreach (var item in birthdays)
                 {
                     result += $"● {item.Text}\n";
                 }
@@ -57,28 +67,30 @@ namespace TeamCalendarEventBot.Services
 
         public static int CountCalendarEventsByDate(DateTime date)
         {
-            var foundEvents = _allGeneralEvents.Where(x => x.Date == date && x.IsActive == true);
-            return foundEvents.Count();
+            var foundEvents = _allGeneralEvents.Where(x => x.Date == date && x.IsActive == true && x.Type != CalendarEventType.Birthday);
+            var birthdays = _allGeneralEvents.Where(x => x.Date.Day == date.Day && x.Date.Month == date.Month && x.Type == CalendarEventType.Birthday && x.IsActive == true);
+            return foundEvents.Count() + birthdays.Count();
         }
 
         public static async Task EditCalendarEventsByDateAsync(ITelegramBotClient botClient, DateTime date, UserBot user)
         {
-            var foundEvents = _allGeneralEvents.Where(x => x.Date == date && x.IsActive == true);
+            var foundEvents = _allGeneralEvents.Where(x => x.Date == date && x.IsActive == true && x.Type != CalendarEventType.Birthday);
+            var birthdays = _allGeneralEvents.Where(x => x.Date.Day == date.Day && x.Date.Month == date.Month && x.Type == CalendarEventType.Birthday && x.IsActive == true);
             List<InlineKeyboardButton> keyboardButtons;
             foreach (var item in foundEvents)
             {
                 keyboardButtons = new List<InlineKeyboardButton> { new InlineKeyboardButton(MessageConst.Delete) { CallbackData = $"{CallbackConst.DeleteEvent} {item.Id}" }};
                 await botClient.SendTextMessageAsync(user.ChatId, item.Text, replyMarkup: new InlineKeyboardMarkup(keyboardButtons));
             }
+            foreach (var item in birthdays)
+            {
+                keyboardButtons = new List<InlineKeyboardButton> { new InlineKeyboardButton(MessageConst.Delete) { CallbackData = $"{CallbackConst.DeleteEvent} {item.Id}" } };
+                await botClient.SendTextMessageAsync(user.ChatId, item.Text, replyMarkup: new InlineKeyboardMarkup(keyboardButtons));
+            }
         }
 
-        public static async Task AddGeneralEventAsync(ITelegramBotClient botClient, UserBot user, CalendarEvent calendarEvent)
+        public static void AddGeneralEventAsync(CalendarEvent calendarEvent)
         {
-            if (((Permission)user.Permissions & Permission.CommonCalendar) != Permission.CommonCalendar)
-            {
-                await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
-                return;
-            }
             _allGeneralEvents.Add(calendarEvent);
             _dataProvider.AddGeneralEvent(calendarEvent);
         }

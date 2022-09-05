@@ -12,6 +12,7 @@
         public const string ManagePermissions = "Керування дозволами";
         public const string Delete = "Видалити";
         public const string GettingNotifications = "Отримування нагадувань";
+        public const string WatchTimetable = "Подивитися розклад";
 
 
         //commands

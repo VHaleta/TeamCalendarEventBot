@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TeamCalendarEventBot.Constants;
 using TeamCalendarEventBot.Helpers;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -79,7 +76,7 @@ namespace TeamCalendarEventBot.Services
                 for (int j = 0; j < 7; j++)
                 {
                     if (int.TryParse(days[i][j], out day))
-                        keyboardButtons[i + 2].Add(new InlineKeyboardButton($"{days[i][j]}{((EventHandler.CountCalendarEventsByDate(new DateTime(date.Year, date.Month, day)) > 0) ? $"({EventHandler.CountCalendarEventsByDate(new DateTime(date.Year, date.Month, day))})" : "")}{((days[i][j] == DateTime.Today.Day.ToString() && date.Month == DateTime.Today.Month) ? "!" : "")}") { CallbackData = $"{prev} {days[i][j]}.{date.ToString("MM.yyyy")}"});
+                        keyboardButtons[i + 2].Add(new InlineKeyboardButton($"{days[i][j]}{((EventHandler.CountCalendarEventsByDate(new DateTime(date.Year, date.Month, day)) > 0) ? $"({EventHandler.CountCalendarEventsByDate(new DateTime(date.Year, date.Month, day))})" : "")}{((days[i][j] == DateTime.Today.Day.ToString() && date.Month == DateTime.Today.Month && date.Year == DateTime.Today.Year) ? "!" : "")}") { CallbackData = $"{prev} {days[i][j]}.{date.ToString("MM.yyyy")}"});
                     else
                         keyboardButtons[i + 2].Add(new InlineKeyboardButton(" ") { CallbackData = CallbackConst.Nothing });
                 }

@@ -17,9 +17,11 @@ namespace TeamCalendarEventBot
 
         public static async Task Main()
         {
+            Console.OutputEncoding = Encoding.UTF8;
             Bot = new TelegramBotClient(TelegramBotInfo.Token);
 
             User me = await Bot.GetMeAsync();
+
             using var cts = new CancellationTokenSource();
 
             // StartReceiving does not block the caller thread. Receiving is done on the ThreadPool.

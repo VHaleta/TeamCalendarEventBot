@@ -43,6 +43,7 @@ namespace TeamCalendarEventBot.Sevices
                 MessageConst.RunNotifications => RunNotificationsCommand(botClient, user),
                 //Startapmenu
                 MessageConst.Calendar => CalendarMessageAsync(botClient, user),
+                MessageConst.WatchTimetable => WatchTimetableMessageAsync(botClient, user),
                 MessageConst.CheckAuthenticationRequests => AuthenticationMessageAsync(botClient, user),
                 MessageConst.ManagePermissions => ManagePermissionsMessageAsync(botClient, user),
                 MessageConst.GettingNotifications => GettingNotificationsMessageAsync(botClient, user),
@@ -112,6 +113,11 @@ namespace TeamCalendarEventBot.Sevices
             await botClient.SendTextMessageAsync(user.ChatId, MessageConst.ChoseAction, replyMarkup: Menu.GetMenuButtons((Permission)user.Permissions, MenuStage.CalendarMenu));
         }
 
+        private static async Task WatchTimetableMessageAsync(ITelegramBotClient botClient, UserBot user)
+        {
+            await botClient.SendTextMessageAsync(user.ChatId, "https://cist.nure.ua/ias/app/tt/f?p=778:201:3968484794665844:::201:P201_FIRST_DATE,P201_LAST_DATE,P201_GROUP,P201_POTOK:01.09.2022,31.01.2023,9287984,0");
+        }
+
         private static async Task StartupMessageAsync(ITelegramBotClient botClient, UserBot user)
         {
             await botClient.SendTextMessageAsync(user.ChatId, MessageConst.ChoseAction, replyMarkup: Menu.GetMenuButtons((Permission)user.Permissions, MenuStage.MainMenu));
@@ -147,8 +153,14 @@ namespace TeamCalendarEventBot.Sevices
 
         private static async Task OnAddingTextToEventMessageAsync(ITelegramBotClient botClient, UserBot user, string message)
         {
+            if (((Permission)user.Permissions & Permission.CommonCalendar) != Permission.CommonCalendar)
+            {
+                await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
+                LogHandler.LogDebug("NotEnoughPermissions", user);
+                return;
+            }
             CalendarEvent tempEvent = new CalendarEvent() { Date = user.TempDate, Text = message };
-            await Services.EventHandler.AddGeneralEventAsync(botClient, user, tempEvent);
+            Services.EventHandler.AddGeneralEventAsync(tempEvent);
             List<List<InlineKeyboardButton>> keyboardButtons = new List<List<InlineKeyboardButton>> {
                 new List<InlineKeyboardButton>(){ new InlineKeyboardButton(MessageConst.EventTypeDefault) { CallbackData = $"{CallbackConst.AddEventType} {(int)CalendarEventType.Default} {tempEvent.Id}"}, new InlineKeyboardButton(MessageConst.EventTypeDeadline) { CallbackData = $"{CallbackConst.AddEventType} {(int)CalendarEventType.Deadline} {tempEvent.Id}"} },
                 new List<InlineKeyboardButton>(){ new InlineKeyboardButton(MessageConst.EventTypeBirthday) { CallbackData = $"{CallbackConst.AddEventType} {(int)CalendarEventType.Birthday} {tempEvent.Id}"} },

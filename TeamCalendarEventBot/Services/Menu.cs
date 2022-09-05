@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using TeamCalendarEventBot.Constants;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -38,13 +36,13 @@ namespace TeamCalendarEventBot.Services
             List<List<KeyboardButton>> buttons = new List<List<KeyboardButton>>();
 
             if ((permission & Permission.View) == Permission.View)
+            {
                 buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.OnWeekEvents) });
+                buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.Calendar) });
+            }
 
             if (((permission & Permission.OwnCalendar) == Permission.OwnCalendar) || ((permission & Permission.CommonCalendar) == Permission.CommonCalendar))
-            {
-                buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.AddEvent) });
-                buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.EditEvents) });
-            }
+                buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.AddEvent), new KeyboardButton(MessageConst.EditEvents) });
 
             buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.BackToMainMenu) });
 
@@ -60,6 +58,9 @@ namespace TeamCalendarEventBot.Services
 
             if ((permission & Permission.View) == Permission.View)
                 buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.GettingNotifications) });
+
+            if ((permission & Permission.View) == Permission.View)
+                buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.WatchTimetable) });
 
             if ((permission & Permission.Authorizating) == Permission.Authorizating)
                 buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.CheckAuthenticationRequests) });

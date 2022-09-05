@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using TeamCalendarEventBot.DataStorage.DataJsonFile;
 using TeamCalendarEventBot.Sevices;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using TeamCalendarEventBot.Constants;
 using TeamCalendarEventBot.Logger;
 
 namespace TeamCalendarEventBot.Services
