@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using TeamCalendarEventBot.Constants;
 using TeamCalendarEventBot.DataStorage;
 using TeamCalendarEventBot.DataStorage.DataJsonFile;
+using TeamCalendarEventBot.Logger;
 using TeamCalendarEventBot.Models;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -70,10 +71,7 @@ namespace TeamCalendarEventBot.Services
                     username = update.EditedMessage.Chat.Username;
                     break;
                 default:
-                    Console.WriteLine(update.Type + " is not handled");
-                    id = 0;
-                    username = "unknown";
-                    break;
+                    throw new Exception($"{update.Type} is not handled to add user");
             }
             
             var user = _allUsers.FirstOrDefault(x => x.ChatId == id);
@@ -95,7 +93,7 @@ namespace TeamCalendarEventBot.Services
                 };
                 _allUsers.Add(user);
                 _dataProvider.UpsertUser(user);
-                Console.WriteLine($"New User: {id} has beed added");
+                LogHandler.LogDebug($"New User: {id} has beed added", user);
 
                 return user;
             }

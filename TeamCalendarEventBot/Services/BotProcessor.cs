@@ -8,6 +8,7 @@ using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using TeamCalendarEventBot.Constants;
+using TeamCalendarEventBot.Logger;
 
 namespace TeamCalendarEventBot.Services
 {
@@ -18,35 +19,43 @@ namespace TeamCalendarEventBot.Services
             var ErrorMessage = exception switch
             {
                 ApiRequestException apiRequestException => $"Telegram API Error:\n[{apiRequestException.ErrorCode}]\n{apiRequestException.Message}",
-                _ => exception.ToString()
+                _ => exception.Message,
             };
 
-            Console.WriteLine(ErrorMessage);
+            LogHandler.LogError(exception, ErrorMessage);
             return Task.CompletedTask;
         }
 
         public static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
             var user = UserHandler.GetUser(update);
-            if (!user.Active) return;
-            if (!UserHandler.IsUserAuthorizedAsync(botClient, update.Message, user).Result) return;
-            var handler = update.Type switch
+            if (!user.Active)
             {
-                // TODO: Add more processing update types
-                // UpdateType.Unknown:
-                // UpdateType.ChannelPost:
-                // UpdateType.EditedChannelPost:
-                // UpdateType.ShippingQuery:
-                // UpdateType.PreCheckoutQuery:
-                // UpdateType.Poll:
-                //UpdateType.EditedMessage => BotOnMessageReceived(botClient, update.EditedMessage!),
-                //UpdateType.InlineQuery => BotOnInlineQueryReceived(botClient, update.InlineQuery!),
-                //UpdateType.ChosenInlineResult => BotOnChosenInlineResultReceived(botClient, update.ChosenInlineResult!),
+                LogHandler.LogDebug($"User is unactive", user);
+                return;
+            }
+            if (!UserHandler.IsUserAuthorizedAsync(botClient, update.Message, user).Result)
+            {
+                LogHandler.LogDebug($"User isn`t authorized", user);
+                return;
+            }
 
-                UpdateType.Message => UpdateHandler.BotOnMessageReceivedAsync(botClient, update.Message, user),
-                UpdateType.CallbackQuery => UpdateHandler.BotOnCallbackQueryReceived(botClient, update.CallbackQuery, user),
-                _ => UpdateHandler.UnknownUpdateHandlerAsync(botClient, update)
-            };
+            Task handler;
+            switch (update.Type)
+            {
+                case UpdateType.Message:
+                    LogHandler.LogInfo($"Recieved update {update.Type}: {update.Message.Text}", user);
+                    handler = UpdateHandler.BotOnMessageReceivedAsync(botClient, update.Message, user);
+                    break;
+                case UpdateType.CallbackQuery:
+                    LogHandler.LogInfo($"Recieved update {update.Type}: {update.CallbackQuery.Data}", user);
+                    handler = UpdateHandler.BotOnCallbackQueryReceived(botClient, update.CallbackQuery, user);
+                    break;
+                default:
+                    LogHandler.LogInfo($"Recieved unknown update type: {update.Type}", user);
+                    handler = UpdateHandler.UnknownUpdateHandlerAsync(botClient, update);
+                    break;
+            }
 
             try
             {

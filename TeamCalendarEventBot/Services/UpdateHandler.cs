@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TeamCalendarEventBot.Constants;
+using TeamCalendarEventBot.Logger;
 using TeamCalendarEventBot.Models;
 using TeamCalendarEventBot.Services;
 using Telegram.Bot;
@@ -17,13 +18,11 @@ namespace TeamCalendarEventBot.Sevices
         #region UpdateTypes
         public static Task UnknownUpdateHandlerAsync(ITelegramBotClient botClient, Update update)
         {
-            Console.WriteLine($"Unknown update type: {update.Type}");
             return Task.CompletedTask;
         }
         public static async Task BotOnMessageReceivedAsync(ITelegramBotClient botClient, Message message, UserBot user)
         {
             if (message.Type != MessageType.Text) return;
-            Console.WriteLine($"Receive update type: Message: {message.Text}\nchat id: {user.ChatId} username: {user.Username}\n----------------------------------------------------");
 
             if (user.UserStatus != UserStatus.None)
             {
@@ -56,12 +55,18 @@ namespace TeamCalendarEventBot.Sevices
                 _ => UnknownMessageAsync(botClient, user)
             };
 
-            await action;
+            try
+            {
+                await action;
+            }
+            catch(Exception e)
+            {
+                LogHandler.LogError(e, "OnMessage error", user);
+            }
         }
 
         public static async Task BotOnCallbackQueryReceived(ITelegramBotClient botClient, CallbackQuery callbackQuery, UserBot user)
         {
-            Console.WriteLine($"Receive update type: CallbackQuery: {callbackQuery.Data}\nchat id: {user.ChatId} username: {user.Username}\n----------------------------------------------------");
             user.UserStatus = UserStatus.None;
             string data = callbackQuery.Data;
             string[] dataSplit = data.Split();
@@ -83,7 +88,14 @@ namespace TeamCalendarEventBot.Sevices
                 CallbackConst.ChangeMyNotificationStatus => ChangeMyNotificationStatusCallbackQueryAsync(botClient, user, dataSplit),
                 _ => UnknownCallbackQuery(botClient, user)
             };
-            await action;
+            try
+            {
+                await action;
+            }
+            catch(Exception e)
+            {
+                LogHandler.LogError(e, "OnCallbackQuery error", user);
+            }
         }
         #endregion
 
@@ -93,6 +105,7 @@ namespace TeamCalendarEventBot.Sevices
             if (((Permission)user.Permissions & Permission.View) != Permission.View)
             {
                 await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
+                LogHandler.LogDebug("NotEnoughPermissions", user);
                 return;
             }
             await botClient.SendTextMessageAsync(user.ChatId, MessageConst.Calendar, replyMarkup: Calendar.GetCalendarKeyboard(DateTime.Today));
@@ -106,6 +119,7 @@ namespace TeamCalendarEventBot.Sevices
 
         private static async Task UnknownMessageAsync(ITelegramBotClient botClient, UserBot user)
         {
+            LogHandler.LogDebug("Unknown message", user);
             await botClient.SendTextMessageAsync(user.ChatId, text: MessageConst.UnknownMessage);
         }
 
@@ -114,6 +128,7 @@ namespace TeamCalendarEventBot.Sevices
             if ((((Permission)user.Permissions & Permission.CommonCalendar) != Permission.CommonCalendar) || ((Permission)user.Permissions & Permission.OwnCalendar) != Permission.OwnCalendar)
             {
                 await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
+                LogHandler.LogDebug("NotEnoughPermissions", user);
                 return;
             }
             await botClient.SendTextMessageAsync(user.ChatId, MessageConst.Calendar, replyMarkup: Calendar.GetAddingEventKetboard(DateTime.Today));
@@ -124,6 +139,7 @@ namespace TeamCalendarEventBot.Sevices
             if (((Permission)user.Permissions & Permission.View) != Permission.View)
             {
                 await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
+                LogHandler.LogDebug("NotEnoughPermissions", user);
                 return;
             }
             await Services.EventHandler.ShowCalendarEventsByWeekAsync(botClient, DateTime.Today, user);
@@ -147,6 +163,7 @@ namespace TeamCalendarEventBot.Sevices
             if (((Permission)user.Permissions & Permission.Authorizating) != Permission.Authorizating)
             {
                 await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
+                LogHandler.LogDebug("NotEnoughPermissions", user);
                 return;
             }
             List<UserBot> users = UserHandler.GetAllRequestedUsers();
@@ -164,6 +181,7 @@ namespace TeamCalendarEventBot.Sevices
             if (((Permission)user.Permissions & Permission.GivingPermissions) != Permission.GivingPermissions)
             {
                 await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
+                LogHandler.LogDebug("NotEnoughPermissions", user);
                 return;
             }
             List<UserBot> users = UserHandler.GetAllUsersExceptMe(user);
@@ -182,6 +200,7 @@ namespace TeamCalendarEventBot.Sevices
             if ((((Permission)user.Permissions & Permission.CommonCalendar) != Permission.CommonCalendar) || ((Permission)user.Permissions & Permission.OwnCalendar) != Permission.OwnCalendar)
             {
                 await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
+                LogHandler.LogDebug("NotEnoughPermissions", user);
                 return;
             }
             await botClient.SendTextMessageAsync(user.ChatId, MessageConst.Calendar, replyMarkup: Calendar.GetEditEventKeyboard(DateTime.Today));
@@ -190,6 +209,7 @@ namespace TeamCalendarEventBot.Sevices
         private static Task RunNotificationsCommand(ITelegramBotClient botClient, UserBot user)
         {
             NotificationHandler.StartNotifications(botClient);
+            LogHandler.LogDebug("RunNotificationsCommand", user);
             return Task.CompletedTask;
         }
 
@@ -198,6 +218,7 @@ namespace TeamCalendarEventBot.Sevices
             if (((Permission)user.Permissions & Permission.View) != Permission.View)
             {
                 await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
+                LogHandler.LogDebug("NotEnoughPermissions", user);
                 return;
             }
             List<InlineKeyboardButton> keyboardButtons = new List<InlineKeyboardButton> {
@@ -212,10 +233,7 @@ namespace TeamCalendarEventBot.Sevices
         {
             int month = 0, year = 0;
             if (!int.TryParse(dataSplit[1], out month) || !int.TryParse(dataSplit[2], out year))
-            {
-                Console.WriteLine($"Wrong format of month or year: {dataSplit[1]} {dataSplit[2]}");
-                return;
-            }
+                throw new Exception($"Wrong format of month or year: {dataSplit[1]} {dataSplit[2]}");
             DateTime date = new DateTime(year, month, 1);
             await botClient.EditMessageReplyMarkupAsync(chatId: user.ChatId, callbackQuery.Message.MessageId, replyMarkup: Calendar.GetCalendarKeyboard(date));
         }
@@ -223,10 +241,8 @@ namespace TeamCalendarEventBot.Sevices
         {
             DateTime date;
             if (!DateTime.TryParse(dataSplit[1], out date))
-            {
-                Console.WriteLine($"Wrong format of date: {dataSplit[1]}");
-                return;
-            }
+                throw new Exception($"Wrong format of date: {dataSplit[1]}");
+
             await Services.EventHandler.ShowCalendarEventsByDateAsync(botClient, date, user);
         }
 
@@ -234,10 +250,7 @@ namespace TeamCalendarEventBot.Sevices
         {
             DateTime date;
             if (!DateTime.TryParse(dataSplit[1], out date))
-            {
-                Console.WriteLine($"Wrong format of date: {dataSplit[1]}");
-                return;
-            }
+                throw new Exception($"Wrong format of date: {dataSplit[1]}");
             user.UserStatus = UserStatus.Adding;
             user.TempDate = date;
             List<InlineKeyboardButton> keyboardButtons = new List<InlineKeyboardButton>();
@@ -250,20 +263,17 @@ namespace TeamCalendarEventBot.Sevices
             if (((Permission)user.Permissions & Permission.Authorizating) != Permission.Authorizating)
             {
                 await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
+                LogHandler.LogDebug("NotEnoughPermissions", user);
                 return;
             }
             long chatId;
             if (!long.TryParse(dataSplit[1], out chatId))
-            {
-                Console.WriteLine($"Wrong format of chatId: {dataSplit[1]}");
-                return;
-            }
+                throw new Exception($"Wrong format of chatId: {dataSplit[1]}");
+
             UserBot authUser = UserHandler.FindUser(chatId);
             if (authUser == null)
-            {
-                Console.WriteLine($"User {chatId} doesn`t exist");
-                return;
-            }
+                throw new Exception($"User {chatId} doesn`t exist");
+
             authUser.Auth = AuthenticationState.Approved;
             UserHandler.UpdateUser(authUser);
             await botClient.SendTextMessageAsync(authUser.ChatId, MessageConst.YouHaveBeenAuthorized);
@@ -274,20 +284,17 @@ namespace TeamCalendarEventBot.Sevices
             if (((Permission)user.Permissions & Permission.GivingPermissions) != Permission.GivingPermissions)
             {
                 await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
+                LogHandler.LogDebug("NotEnoughPermissions", user);
                 return;
             }
             long chatId;
             if (!long.TryParse(dataSplit[1], out chatId))
-            {
-                Console.WriteLine($"Wrong format of chatId: {dataSplit[1]}");
-                return;
-            }
+                throw new Exception($"Wrong format of chatId: {dataSplit[1]}");
+
             UserBot managedUser = UserHandler.FindUser(chatId);
             if (managedUser == null)
-            {
-                Console.WriteLine($"User {chatId} doesn`t exist");
-                return;
-            }
+                throw new Exception($"User {chatId} doesn`t exist");
+
             List<List<InlineKeyboardButton>> keyboardButtons = new List<List<InlineKeyboardButton>>
             {
                 new List<InlineKeyboardButton>(){ new InlineKeyboardButton($"{MessageConst.PermissionView} - {((((Permission)managedUser.Permissions & Permission.View) == Permission.View) ? MessageConst.Yes : MessageConst.No)}") { CallbackData = $"{CallbackConst.ChangePermission} {(int)Permission.View} {managedUser.ChatId}" } },
@@ -304,20 +311,17 @@ namespace TeamCalendarEventBot.Sevices
             if (((Permission)user.Permissions & Permission.GivingPermissions) != Permission.GivingPermissions)
             {
                 await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
+                LogHandler.LogDebug("NotEnoughPermissions", user);
                 return;
             }
             long chatId;
             if (!long.TryParse(dataSplit[2], out chatId))
-            {
-                Console.WriteLine($"Wrong format of chatId: {dataSplit[2]}");
-                return;
-            }
+                throw new Exception($"Wrong format of chatId: {dataSplit[2]}");
+
             int permission;
             if (!int.TryParse(dataSplit[1], out permission))
-            {
-                Console.WriteLine($"Wrong format of permission: {dataSplit[1]}");
-                return;
-            }
+                throw new Exception($"Wrong format of permission: {dataSplit[1]}");
+
             UserBot managedUser = UserHandler.FindUser(chatId);
             Permission permissions = (Permission)managedUser.Permissions;
             switch ((Permission)permission)
@@ -374,14 +378,13 @@ namespace TeamCalendarEventBot.Sevices
             if (((Permission)user.Permissions & Permission.CommonCalendar) != Permission.CommonCalendar)
             {
                 await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
+                LogHandler.LogDebug("NotEnoughPermissions", user);
                 return;
             }
             Guid Id;
             if (!Guid.TryParse(dataSplit[1], out Id))
-            {
-                Console.WriteLine($"Wrong format of event id: {dataSplit[1]}");
-                return;
-            }
+                throw new Exception($"Wrong format of event id: {dataSplit[1]}");
+
             Services.EventHandler.DeleteGeneralEvent(Id);
             List<InlineKeyboardButton> keyboardButtons = new List<InlineKeyboardButton>();
             await botClient.EditMessageTextAsync(user.ChatId, callbackQuery.Message.MessageId, MessageConst.EventHasBeenDeleted, replyMarkup: new InlineKeyboardMarkup(keyboardButtons));
@@ -393,20 +396,19 @@ namespace TeamCalendarEventBot.Sevices
             if (((Permission)user.Permissions & Permission.CommonCalendar) != Permission.CommonCalendar)
             {
                 await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
+                LogHandler.LogDebug("NotEnoughPermissions", user);
                 return;
             }
             DateTime date;
             if (!DateTime.TryParse(dataSplit[1], out date))
-            {
-                Console.WriteLine($"Wrong format of date: {dataSplit[1]}");
-                return;
-            }
+                throw new Exception($"Wrong format of date: {dataSplit[1]}");
+
             await Services.EventHandler.EditCalendarEventsByDateAsync(botClient, date, user);
         }
 
         private static Task UnknownCallbackQuery(ITelegramBotClient botClient, UserBot user)
         {
-            Console.WriteLine("Unknown callback query");
+            LogHandler.LogDebug("Unknown callback query", user);
             return Task.CompletedTask;
         }
 
@@ -415,22 +417,21 @@ namespace TeamCalendarEventBot.Sevices
             if (((Permission)user.Permissions & Permission.CommonCalendar) != Permission.CommonCalendar)
             {
                 await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
+                LogHandler.LogDebug("NotEnoughPermissions", user);
                 return;
             }
             int type;
             if (!int.TryParse(dataSplit[1], out type))
-            {
-                Console.WriteLine($"Wrong format of event type: {dataSplit[1]}");
-                return;
-            }
+                throw new Exception($"Wrong format of event type: {dataSplit[1]}");
+
             Guid eventId;
             if (!Guid.TryParse(dataSplit[2], out eventId))
-            {
-                Console.WriteLine($"Wrong format of event id: {dataSplit[1]}");
-                return;
-            }
+                throw new Exception($"Wrong format of event id: {dataSplit[2]}");
+
             CalendarEvent tempEvent = Services.EventHandler.FindEvent(eventId);
-            if (tempEvent == null) return;
+            if (tempEvent == null)
+                throw new Exception($"Event {eventId} doesn`t exist");
+
             tempEvent.Type = (CalendarEventType)type;
             Services.EventHandler.EditEvent(tempEvent);
             List<List<InlineKeyboardButton>> keyboardButtons = new List<List<InlineKeyboardButton>>
@@ -449,22 +450,20 @@ namespace TeamCalendarEventBot.Sevices
             if (((Permission)user.Permissions & Permission.CommonCalendar) != Permission.CommonCalendar)
             {
                 await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
+                LogHandler.LogDebug("NotEnoughPermissions", user);
                 return;
             }
             int notification;
             if (!int.TryParse(dataSplit[1], out notification))
-            {
-                Console.WriteLine($"Wrong format of notification: {dataSplit[1]}");
-                return;
-            }
+                throw new Exception($"Wrong format of notification: {dataSplit[1]}");
+
             Guid eventId;
             if (!Guid.TryParse(dataSplit[2], out eventId))
-            {
-                Console.WriteLine($"Wrong format of event id: {dataSplit[1]}");
-                return;
-            }
+                throw new Exception($"Wrong format of event id: {dataSplit[2]}");
+
             CalendarEvent tempEvent = Services.EventHandler.FindEvent(eventId);
-            if (tempEvent == null) return;
+            if (tempEvent == null)
+                throw new Exception($"Event {eventId} doesn`t exist");
 
             Notification notifications = (Notification)tempEvent.Notifications;
             switch ((Notification)notification)
@@ -516,16 +515,17 @@ namespace TeamCalendarEventBot.Sevices
             if (((Permission)user.Permissions & Permission.CommonCalendar) != Permission.CommonCalendar)
             {
                 await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
+                LogHandler.LogDebug("NotEnoughPermissions", user);
                 return;
             }
             Guid eventId;
             if (!Guid.TryParse(dataSplit[1], out eventId))
-            {
-                Console.WriteLine($"Wrong format of event id: {dataSplit[1]}");
-                return;
-            }
+                throw new Exception($"Wrong format of event id: {dataSplit[1]}");
+
             CalendarEvent tempEvent = Services.EventHandler.FindEvent(eventId);
-            if (tempEvent == null) return;
+            if (tempEvent == null)
+                throw new Exception($"Event {eventId} doesn`t exist");
+
             tempEvent.IsActive = true;
             Services.EventHandler.EditEvent(tempEvent);
             List<InlineKeyboardButton> keyboardButtons = new List<InlineKeyboardButton>();
@@ -536,14 +536,13 @@ namespace TeamCalendarEventBot.Sevices
             if (((Permission)user.Permissions & Permission.CommonCalendar) != Permission.CommonCalendar)
             {
                 await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
+                LogHandler.LogDebug("NotEnoughPermissions", user);
                 return;
             }
             Guid eventId;
             if (!Guid.TryParse(dataSplit[1], out eventId))
-            {
-                Console.WriteLine($"Wrong format of event id: {dataSplit[1]}");
-                return;
-            }
+                throw new Exception($"Wrong format of event id: {dataSplit[1]}");
+
             Services.EventHandler.DeleteGeneralEvent(eventId);
             List<InlineKeyboardButton> keyboardButtons = new List<InlineKeyboardButton>();
             await botClient.EditMessageTextAsync(user.ChatId, callbackQuery.Message.MessageId, MessageConst.EventHasBeenDeleted, replyMarkup: new InlineKeyboardMarkup(keyboardButtons));
@@ -554,16 +553,17 @@ namespace TeamCalendarEventBot.Sevices
             if (((Permission)user.Permissions & Permission.CommonCalendar) != Permission.CommonCalendar)
             {
                 await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
+                LogHandler.LogDebug("NotEnoughPermissions", user);
                 return;
             }
             Guid eventId;
             if (!Guid.TryParse(dataSplit[1], out eventId))
-            {
-                Console.WriteLine($"Wrong format of event id: {dataSplit[1]}");
-                return;
-            }
+                throw new Exception($"Wrong format of event id: {dataSplit[1]}");
+
             CalendarEvent tempEvent = Services.EventHandler.FindEvent(eventId);
-            if (tempEvent == null) return;
+            if (tempEvent == null)
+                throw new Exception($"Event {eventId} doesn`t exist");
+
             List<List<InlineKeyboardButton>> keyboardButtons = new List<List<InlineKeyboardButton>>
             {
                 new List<InlineKeyboardButton>(){new InlineKeyboardButton(MessageConst.AddEventToCommonCalendar) { CallbackData = $"{CallbackConst.AddEventToCommonCalendar} {tempEvent.Id}" } },
@@ -578,20 +578,17 @@ namespace TeamCalendarEventBot.Sevices
             if (((Permission)user.Permissions & Permission.View) != Permission.View)
             {
                 await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
+                LogHandler.LogDebug("NotEnoughPermissions", user);
                 return;
             }
             int status;
             if (!int.TryParse(dataSplit[1], out status))
-            {
-                Console.WriteLine($"Wrong format of status: {dataSplit[1]}");
-                return;
-            }
+                throw new Exception($"Wrong format of status: {dataSplit[1]}");
+
             long chatId;
             if (!long.TryParse(dataSplit[2], out chatId))
-            {
-                Console.WriteLine($"Wrong format of chat id: {dataSplit[1]}");
-                return;
-            }
+                throw new Exception($"Wrong format of chat id: {dataSplit[2]}");
+
             UserBot managedUser = UserHandler.FindUser(chatId);
             managedUser.GetNotification = Convert.ToBoolean(status);
             UserHandler.UpdateUser(managedUser);

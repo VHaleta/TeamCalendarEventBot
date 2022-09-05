@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Telegram.Bot;
 using TeamCalendarEventBot.Models;
 using TeamCalendarEventBot.Constants;
+using TeamCalendarEventBot.Logger;
 
 namespace TeamCalendarEventBot.Services
 {
@@ -21,7 +22,7 @@ namespace TeamCalendarEventBot.Services
         }
         private static async void CheckNotifications(Object source, ElapsedEventArgs e)
         {
-            Console.WriteLine("NOTIFICATION");
+            LogHandler.LogDebug("Notification check");
             List<CalendarEvent> calendarEvents = EventHandler.GetCalendarEventsForNotification();
             string result = "", inDay = "", forOneDay = "", forTwoDays = "", forAWeek = "";
             bool doesInDay = false, doesForOneDay = false, doesForTwoDays = false, doesForAWeek = false;

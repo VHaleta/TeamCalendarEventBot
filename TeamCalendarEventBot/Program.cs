@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using TeamCalendarEventBot.Constants;
+using TeamCalendarEventBot.Logger;
 using TeamCalendarEventBot.Services;
 using Telegram.Bot;
 using Telegram.Bot.Extensions.Polling;
@@ -16,12 +17,9 @@ namespace TeamCalendarEventBot
 
         public static async Task Main()
         {
-            Console.OutputEncoding = Encoding.UTF8;
             Bot = new TelegramBotClient(TelegramBotInfo.Token);
 
             User me = await Bot.GetMeAsync();
-            Console.Title = me.Username ?? "My awesome Bot";
-
             using var cts = new CancellationTokenSource();
 
             // StartReceiving does not block the caller thread. Receiving is done on the ThreadPool.
@@ -31,7 +29,7 @@ namespace TeamCalendarEventBot
                                receiverOptions,
                                cts.Token);
 
-            Console.WriteLine($"Start listening for @{me.Username}");
+            LogHandler.LogDebug($"Start listening for @{me.Username}");
             Console.ReadLine();
 
             // Send cancellation request to stop bot
