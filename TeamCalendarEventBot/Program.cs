@@ -32,8 +32,13 @@ namespace TeamCalendarEventBot
                                cts.Token);
 
             LogHandler.LogDebug($"Start listening for @{me.Username}");
+#if DEBUG
+            // To Debug in Windows Console
             Console.ReadLine();
-
+#else
+            // To run as daemon in Linux
+            Thread.Sleep(-1);
+#endif
             // Send cancellation request to stop bot
             cts.Cancel();
         }
