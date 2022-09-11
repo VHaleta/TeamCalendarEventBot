@@ -330,6 +330,7 @@ namespace TeamCalendarEventBot.Sevices
                 throw new Exception($"Wrong format of permission: {dataSplit[1]}");
 
             UserBot managedUser = UserHandler.FindUser(chatId);
+            if (managedUser == null) throw new Exception($"Null user {chatId}");
             Permission permissions = (Permission)managedUser.Permissions;
             switch ((Permission)permission)
             {

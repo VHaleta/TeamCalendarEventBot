@@ -14,6 +14,7 @@ namespace TeamCalendarEventBot
     public static class Program
     {
         private static TelegramBotClient Bot;
+        private static TelegramBotClient tempBot;
 
         public static async Task Main()
         {
@@ -32,6 +33,14 @@ namespace TeamCalendarEventBot
                                cts.Token);
 
             LogHandler.LogDebug($"Start listening for @{me.Username}");
+
+
+            using var cts2 = new CancellationTokenSource();
+            tempBot = new TelegramBotClient("5754907983:AAGBmC5n0cMVPUaZr4Q64ct1CrLdmEzQPtk");
+            tempBot.StartReceiving(TempBot.HandleUpdateAsync,
+                TempBot.HandleErrorAsync,
+                receiverOptions,
+                cts2.Token);
 #if DEBUG
             // To Debug in Windows Console
             Console.ReadLine();
