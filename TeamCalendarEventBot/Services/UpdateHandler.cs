@@ -14,7 +14,6 @@ namespace TeamCalendarEventBot.Sevices
 {
     public class UpdateHandler
     {
-        //TODO:Review permissions
         #region UpdateTypes
         public static Task UnknownUpdateHandlerAsync(ITelegramBotClient botClient, Update update)
         {
