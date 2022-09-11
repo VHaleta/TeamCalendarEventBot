@@ -1,7 +1,13 @@
-﻿namespace TeamCalendarEventBot.Helpers
+﻿using System;
+using System.Globalization;
+
+namespace TeamCalendarEventBot.Helpers
 {
     public static class DateConverter
     {
+        public static DateTime CustomDateParse(this string value)
+            => DateTime.ParseExact(value, "dd.MM.yyyy", new CultureInfo("en-US", true));
+
         public static string NumberToMonth(int month)
         {
             switch (month)

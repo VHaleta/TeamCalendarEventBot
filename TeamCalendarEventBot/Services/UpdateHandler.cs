@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TeamCalendarEventBot.Constants;
+using TeamCalendarEventBot.Helpers;
 using TeamCalendarEventBot.Logger;
 using TeamCalendarEventBot.Models;
 using TeamCalendarEventBot.Services;
@@ -250,18 +251,13 @@ namespace TeamCalendarEventBot.Sevices
         }
         private static async Task ShowCalendarEventsByDateCallbackQueryAsync(ITelegramBotClient botClient, UserBot user, string[] dataSplit)
         {
-            DateTime date;
-            if (!DateTime.TryParse(dataSplit[1], out date))
-                throw new Exception($"Wrong format of date: {dataSplit[1]}");
-
+            var date = dataSplit[1].CustomDateParse();
             await Services.EventHandler.ShowCalendarEventsByDateAsync(botClient, date, user);
         }
 
         private static async Task AddingEventCallbackQueryAsync(ITelegramBotClient botClient, CallbackQuery callbackQuery, UserBot user, string[] dataSplit)
         {
-            DateTime date;
-            if (!DateTime.TryParse(dataSplit[1], out date))
-                throw new Exception($"Wrong format of date: {dataSplit[1]}");
+            var date = dataSplit[1].CustomDateParse();
             user.UserStatus = UserStatus.Adding;
             user.TempDate = date;
             List<InlineKeyboardButton> keyboardButtons = new List<InlineKeyboardButton>();
@@ -410,10 +406,7 @@ namespace TeamCalendarEventBot.Sevices
                 LogHandler.LogDebug("NotEnoughPermissions", user);
                 return;
             }
-            DateTime date;
-            if (!DateTime.TryParse(dataSplit[1], out date))
-                throw new Exception($"Wrong format of date: {dataSplit[1]}");
-
+            var date = dataSplit[1].CustomDateParse();
             await Services.EventHandler.EditCalendarEventsByDateAsync(botClient, date, user);
         }
 
