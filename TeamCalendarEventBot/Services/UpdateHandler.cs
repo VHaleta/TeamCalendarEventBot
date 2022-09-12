@@ -47,6 +47,7 @@ namespace TeamCalendarEventBot.Sevices
                 MessageConst.CheckAuthenticationRequests => AuthenticationMessageAsync(botClient, user),
                 MessageConst.ManagePermissions => ManagePermissionsMessageAsync(botClient, user),
                 MessageConst.GettingNotifications => GettingNotificationsMessageAsync(botClient, user),
+                MessageConst.Info => InfoMessageAsync(botClient, user),
                 //CalendarMenu
                 MessageConst.AddEvent => AddEventMessageAsync(botClient, user),
                 MessageConst.OnWeekEvents => OnWeekEventsMessageAsync(botClient, user),
@@ -253,6 +254,10 @@ namespace TeamCalendarEventBot.Sevices
         {
             var date = dataSplit[1].CustomDateParse();
             await Services.EventHandler.ShowCalendarEventsByDateAsync(botClient, date, user);
+        }
+        private static async Task InfoMessageAsync(ITelegramBotClient botClient, UserBot user)
+        {
+            await botClient.SendTextMessageAsync(user.ChatId, MessageConst.InfoAboutBot);
         }
 
         private static async Task AddingEventCallbackQueryAsync(ITelegramBotClient botClient, CallbackQuery callbackQuery, UserBot user, string[] dataSplit)

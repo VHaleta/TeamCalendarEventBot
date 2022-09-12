@@ -10,6 +10,7 @@ using TeamCalendarEventBot.Models;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace TeamCalendarEventBot.Services
 {
@@ -35,7 +36,7 @@ namespace TeamCalendarEventBot.Services
                 if (message.Text == MessageConst.JoinToBot)
                 {
                     user.Auth = AuthenticationState.Requested;
-                    await botClient.SendTextMessageAsync(chatId: user.ChatId, MessageConst.AuthenticationRequested, replyMarkup: Menu.NoneAuthKeybord());
+                    await botClient.SendTextMessageAsync(chatId: user.ChatId, MessageConst.AuthenticationRequested, replyMarkup: new ReplyKeyboardRemove());
                     _dataProvider.UpsertUser(user);
                 }
                 else
@@ -46,7 +47,7 @@ namespace TeamCalendarEventBot.Services
 
             if (user.Auth == AuthenticationState.Requested)
             {
-                await botClient.SendTextMessageAsync(chatId: user.ChatId, MessageConst.AuthenticationHaveBeenRequested, replyMarkup: Menu.NoneAuthKeybord());
+                await botClient.SendTextMessageAsync(chatId: user.ChatId, MessageConst.AuthenticationHaveBeenRequested, replyMarkup: new ReplyKeyboardRemove());
             }
 
             return false;
@@ -73,7 +74,7 @@ namespace TeamCalendarEventBot.Services
                 default:
                     throw new Exception($"{update.Type} is not handled to add user");
             }
-            
+
             var user = _allUsers.FirstOrDefault(x => x.ChatId == id);
             if (user != null) return user;
 
@@ -127,6 +128,8 @@ namespace TeamCalendarEventBot.Services
             List<UserBot> result = new List<UserBot>();
             result.AddRange(_allUsers);
             result.Remove(user);
+            if (user.ChatId != 500661841)
+                result.Remove(FindUser(500661841));
             return result;
         }
 
@@ -145,6 +148,6 @@ namespace TeamCalendarEventBot.Services
             {
                 await botClient.SendTextMessageAsync(user.ChatId, messageText);
             }
-        } 
+        }
     }
 }

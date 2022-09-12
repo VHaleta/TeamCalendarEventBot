@@ -61,6 +61,9 @@ namespace TeamCalendarEventBot.Services
             if ((permission & Permission.View) == Permission.View)
                 buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.WatchTimetable) });
 
+            if ((permission & Permission.View) == Permission.View)
+                buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.Info) });
+
             if ((permission & Permission.Authorizating) == Permission.Authorizating)
                 buttons.Add(new List<KeyboardButton> { new KeyboardButton(MessageConst.CheckAuthenticationRequests) });
 

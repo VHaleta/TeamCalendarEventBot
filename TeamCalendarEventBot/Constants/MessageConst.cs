@@ -13,6 +13,7 @@
         public const string Delete = "Видалити";
         public const string GettingNotifications = "Отримування нагадувань";
         public const string WatchTimetable = "Подивитися розклад";
+        public const string Info = "Інфо";
 
 
         //commands
@@ -47,7 +48,7 @@
         public const string AuthenticationHaveBeenRequested = "Авторизація вже буза запрошена, зачекайте підтвердження";
         public const string YouHaveChosenDate = "Ви обрали дату";
         public const string WriteEventText = "Напишіть текст події";
-        public const string YouHaveBeenAuthorized = "Вас було авторизовано";
+        public const string YouHaveBeenAuthorized = "Вас було авторизовано. Зачекайте поки вам будуть надані повноваження";
         public const string EventsOn = "Події на";
         public const string NoEvents = "Подій нема";
         public const string NotEnoughPermissions = "У вас недостатньо повноважень";
@@ -66,6 +67,7 @@
         public const string DoesGetNotifications = "Отримувати нагадування?";
         public const string NowYouAreGettingNotifications = "Тепер ви отримуєте нагадування";
         public const string NowYouAreNotGettingNotifications = "Тепер ви не отримуєте нагадування";
+        public const string InfoAboutBot = "Цей бот створений для користування спільним календарем\nВи можете переглядати події, додані адміністраторами бота\nДля отримання більших повноважень/повідомлення про помилки/з пропозиціями змін бота писати @GaletaKatleta";
 
         public static string UserHaveBeenAuthorized(string username) => $"Користувача @{username} авторизовано";
 
