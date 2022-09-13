@@ -13,7 +13,7 @@ namespace TeamCalendarEventBot.Logger
 
         public static void LogDebug(string message, UserBot user)
         {
-            message += $" username = {user.Username} userStatus = {user.UserStatus}";
+            message += $" username = {user.Username}({user.FirstName} {user.LastName})";
             logger.LogDebug(message);
         }
 
@@ -24,7 +24,7 @@ namespace TeamCalendarEventBot.Logger
 
         public static void LogInfo(string message, UserBot user)
         {
-            message += $" username = {user.Username} userStatus = {user.UserStatus}";
+            message += $" username = {user.Username}({user.FirstName} {user.LastName})";
             logger.LogInfo(message);
         }
 
@@ -35,7 +35,7 @@ namespace TeamCalendarEventBot.Logger
 
         public static void LogError(Exception e, string message, UserBot user)
         {
-            message += $" username = {user.Username} userStatus = {user.UserStatus}";
+            message += $" username = {user.Username}({user.FirstName} {user.LastName})";
             logger.LogError(e, message);
         }
 

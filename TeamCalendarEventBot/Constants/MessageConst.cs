@@ -45,7 +45,7 @@
         //reply
         public const string YouAreNotAuthorized = "Ви не авторизовані";
         public const string AuthenticationRequested = "Авторизація запрошена";
-        public const string AuthenticationHaveBeenRequested = "Авторизація вже буза запрошена, зачекайте підтвердження";
+        public const string AuthenticationHaveBeenRequested = "Авторизація вже була запрошена, зачекайте підтвердження";
         public const string YouHaveChosenDate = "Ви обрали дату";
         public const string WriteEventText = "Напишіть текст події";
         public const string YouHaveBeenAuthorized = "Вас було авторизовано. Зачекайте поки вам будуть надані повноваження";

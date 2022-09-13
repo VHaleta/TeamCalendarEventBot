@@ -186,7 +186,7 @@ namespace TeamCalendarEventBot.Sevices
             {
                 List<InlineKeyboardButton> keyboardButtons = new List<InlineKeyboardButton> {
                     new InlineKeyboardButton("Авторизувати") { CallbackData = $"{CallbackConst.Authentication} {item.ChatId}"} };
-                await botClient.SendTextMessageAsync(user.ChatId, $"@{item.Username}", replyMarkup: new InlineKeyboardMarkup(keyboardButtons));
+                await botClient.SendTextMessageAsync(user.ChatId, $"@{item.Username} ({item.FirstName} {item.LastName})", replyMarkup: new InlineKeyboardMarkup(keyboardButtons));
             }
         }
         private static async Task ManagePermissionsMessageAsync(ITelegramBotClient botClient, UserBot user)
@@ -204,7 +204,7 @@ namespace TeamCalendarEventBot.Sevices
             {
                 List<InlineKeyboardButton> keyboardButtons = new List<InlineKeyboardButton> {
                     new InlineKeyboardButton(MessageConst.ChangePermissions) { CallbackData = $"{CallbackConst.ManagePermissions} {item.ChatId}"} };
-                await botClient.SendTextMessageAsync(user.ChatId, $"@{item.Username}", replyMarkup: new InlineKeyboardMarkup(keyboardButtons));
+                await botClient.SendTextMessageAsync(user.ChatId, $"@{item.Username} ({item.FirstName} {item.LastName})", replyMarkup: new InlineKeyboardMarkup(keyboardButtons));
             }
         }
 

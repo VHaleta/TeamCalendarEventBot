@@ -28,7 +28,7 @@ namespace TeamCalendarEventBot.Services
                 Notification notifications = (Notification)calendarEvent.Notifications;
                 if ((((Notification)calendarEvent.Notifications & Notification.InDay) == Notification.InDay) && (calendarEvent.Date == DateTime.Today))
                 {
-                    inDay = $"● {calendarEvent.Text}\n";
+                    inDay += $"● {calendarEvent.Text}\n";
                     notifications &= ~Notification.InDay;
                     doesInDay = true;
                     calendarEvent.Notifications = (int)notifications;
@@ -36,7 +36,7 @@ namespace TeamCalendarEventBot.Services
                 }
                 if ((((Notification)calendarEvent.Notifications & Notification.ForOneDay) == Notification.ForOneDay) && (calendarEvent.Date == DateTime.Today.AddDays(+1)))
                 {
-                    forOneDay = $"● {calendarEvent.Text}\n";
+                    forOneDay += $"● {calendarEvent.Text}\n";
                     notifications &= ~Notification.ForOneDay;
                     doesForOneDay = true;
                     calendarEvent.Notifications = (int)notifications;
@@ -44,7 +44,7 @@ namespace TeamCalendarEventBot.Services
                 }
                 if ((((Notification)calendarEvent.Notifications & Notification.ForTwoDays) == Notification.ForTwoDays) && (calendarEvent.Date == DateTime.Today.AddDays(+2)))
                 {
-                    forTwoDays = $"● {calendarEvent.Text}\n";
+                    forTwoDays += $"● {calendarEvent.Text}\n";
                     notifications &= ~Notification.ForTwoDays;
                     doesForTwoDays = true;
                     calendarEvent.Notifications = (int)notifications;
@@ -52,7 +52,7 @@ namespace TeamCalendarEventBot.Services
                 }
                 if ((((Notification)calendarEvent.Notifications & Notification.ForAWeek) == Notification.ForAWeek) && (calendarEvent.Date == DateTime.Today.AddDays(+7)))
                 {
-                    forAWeek = $"● {calendarEvent.Text}\n";
+                    forAWeek += $"● {calendarEvent.Text}\n";
                     notifications &= ~Notification.ForAWeek;
                     doesForAWeek = true;
                     calendarEvent.Notifications = (int)notifications;
