@@ -17,5 +17,9 @@
         public const string CancelAdding = "cancelAdding";
         public const string GoToFinalAddingStage = "goToFinalAddingStage";
         public const string ChangeMyNotificationStatus = "changeMyNotificationStatus";
+
+        public const string ViewCalendarKeyboard = "viewCalendarKeyboard";
+        public const string AddingCalendarKeyboard = "addingCalendarKeyboard";
+        public const string EditCalendarKeyboard = "EditCalendarKeyboard";
     }
 }

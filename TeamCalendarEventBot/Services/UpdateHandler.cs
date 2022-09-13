@@ -110,7 +110,7 @@ namespace TeamCalendarEventBot.Sevices
                 LogHandler.LogDebug("NotEnoughPermissions", user);
                 return;
             }
-            await botClient.SendTextMessageAsync(user.ChatId, MessageConst.Calendar, replyMarkup: Calendar.GetCalendarKeyboard(DateTime.Today));
+            await botClient.SendTextMessageAsync(user.ChatId, MessageConst.Calendar, replyMarkup: Calendar.GetCalendarKeyboard(DateTime.Today, CallbackConst.GetEvents));
             await botClient.SendTextMessageAsync(user.ChatId, MessageConst.ChoseAction, replyMarkup: Menu.GetMenuButtons((Permission)user.Permissions, MenuStage.CalendarMenu));
         }
 
@@ -138,7 +138,7 @@ namespace TeamCalendarEventBot.Sevices
                 LogHandler.LogDebug("NotEnoughPermissions", user);
                 return;
             }
-            await botClient.SendTextMessageAsync(user.ChatId, MessageConst.Calendar, replyMarkup: Calendar.GetAddingEventKetboard(DateTime.Today));
+            await botClient.SendTextMessageAsync(user.ChatId, MessageConst.Calendar, replyMarkup: Calendar.GetCalendarKeyboard(DateTime.Today, CallbackConst.Adding));
         }
 
         private static async Task OnWeekEventsMessageAsync(ITelegramBotClient botClient, UserBot user)
@@ -216,7 +216,7 @@ namespace TeamCalendarEventBot.Sevices
                 LogHandler.LogDebug("NotEnoughPermissions", user);
                 return;
             }
-            await botClient.SendTextMessageAsync(user.ChatId, MessageConst.Calendar, replyMarkup: Calendar.GetEditEventKeyboard(DateTime.Today));
+            await botClient.SendTextMessageAsync(user.ChatId, MessageConst.Calendar, replyMarkup: Calendar.GetCalendarKeyboard(DateTime.Today, CallbackConst.EditEvent));
         }
 
         private static Task RunNotificationsCommand(ITelegramBotClient botClient, UserBot user)
@@ -245,10 +245,10 @@ namespace TeamCalendarEventBot.Sevices
         private static async Task ChangeMonthCallbackQueryAsync(ITelegramBotClient botClient, CallbackQuery callbackQuery, UserBot user, string[] dataSplit)
         {
             int month = 0, year = 0;
-            if (!int.TryParse(dataSplit[1], out month) || !int.TryParse(dataSplit[2], out year))
-                throw new Exception($"Wrong format of month or year: {dataSplit[1]} {dataSplit[2]}");
+            if (!int.TryParse(dataSplit[2], out month) || !int.TryParse(dataSplit[3], out year))
+                throw new Exception($"Wrong format of month or year: {dataSplit[2]} {dataSplit[3]}");
             DateTime date = new DateTime(year, month, 1);
-            await botClient.EditMessageReplyMarkupAsync(chatId: user.ChatId, callbackQuery.Message.MessageId, replyMarkup: Calendar.GetCalendarKeyboard(date));
+            await botClient.EditMessageReplyMarkupAsync(chatId: user.ChatId, callbackQuery.Message.MessageId, replyMarkup: Calendar.GetCalendarKeyboard(date, dataSplit[1]));
         }
         private static async Task ShowCalendarEventsByDateCallbackQueryAsync(ITelegramBotClient botClient, UserBot user, string[] dataSplit)
         {
