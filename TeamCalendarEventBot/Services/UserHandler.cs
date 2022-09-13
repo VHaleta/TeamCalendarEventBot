@@ -143,11 +143,9 @@ namespace TeamCalendarEventBot.Services
 
         public static async Task SendAllNotificatedUsers(ITelegramBotClient botClient, string messageText)
         {
-            LogHandler.LogDebug($"Send all notificated users: {messageText}");
             var notificatedUsers = _allUsers.FindAll(x => x.GetNotification == true);
             foreach (var user in notificatedUsers)
             {
-                LogHandler.LogDebug($"Send to {user.Username}");
                 await botClient.SendTextMessageAsync(user.ChatId, messageText);
             }
         }
