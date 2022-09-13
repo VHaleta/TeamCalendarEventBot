@@ -72,11 +72,15 @@ namespace TeamCalendarEventBot.Services
             for (int i = 0; i < days.Count; i++)
             {
                 keyboardButtons.Add(new List<InlineKeyboardButton> { });
-                int day;
+                int day, eventsCount;
                 for (int j = 0; j < 7; j++)
                 {
                     if (int.TryParse(days[i][j], out day))
-                        keyboardButtons[i + 2].Add(new InlineKeyboardButton($"{days[i][j]}{((EventHandler.CountCalendarEventsByDate(new DateTime(date.Year, date.Month, day)) > 0) ? $"({EventHandler.CountCalendarEventsByDate(new DateTime(date.Year, date.Month, day))})" : "")}{((days[i][j] == DateTime.Today.Day.ToString() && date.Month == DateTime.Today.Month && date.Year == DateTime.Today.Year) ? "!" : "")}") { CallbackData = $"{prev} {days[i][j]}.{date.ToString("MM.yyyy")}"});
+                    {
+                        DateTime tempDate = new DateTime(date.Year, date.Month, day);
+                        eventsCount = EventHandler.CountCalendarEventsByDate(tempDate);
+                        keyboardButtons[i + 2].Add(new InlineKeyboardButton($"{days[i][j]}{((eventsCount > 0) ? $"({eventsCount})" : "")}{((tempDate == DateTime.Today) ? "!" : "")}") { CallbackData = $"{prev} {tempDate.ToString("dd.MM.yyyy")}" });
+                    }
                     else
                         keyboardButtons[i + 2].Add(new InlineKeyboardButton(" ") { CallbackData = CallbackConst.Nothing });
                 }

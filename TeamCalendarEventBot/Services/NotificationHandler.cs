@@ -14,7 +14,7 @@ namespace TeamCalendarEventBot.Services
         private static ITelegramBotClient bot;
         static NotificationHandler()
         {
-            aTimer = new Timer(5000);
+            aTimer = new Timer(600000);
             aTimer.Elapsed += CheckNotifications;
         }
         private static async void CheckNotifications(Object source, ElapsedEventArgs e)
