@@ -132,7 +132,7 @@ namespace TeamCalendarEventBot.Sevices
 
         private static async Task AddEventMessageAsync(ITelegramBotClient botClient, UserBot user)
         {
-            if ((((Permission)user.Permissions & Permission.CommonCalendar) != Permission.CommonCalendar) || ((Permission)user.Permissions & Permission.OwnCalendar) != Permission.OwnCalendar)
+            if ((((Permission)user.Permissions & Permission.CommonCalendar) != Permission.CommonCalendar))
             {
                 await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
                 LogHandler.LogDebug("NotEnoughPermissions", user);
@@ -210,7 +210,7 @@ namespace TeamCalendarEventBot.Sevices
 
         private static async Task EditEventsMessageAsync(ITelegramBotClient botClient, UserBot user)
         {
-            if ((((Permission)user.Permissions & Permission.CommonCalendar) != Permission.CommonCalendar) || ((Permission)user.Permissions & Permission.OwnCalendar) != Permission.OwnCalendar)
+            if ((((Permission)user.Permissions & Permission.CommonCalendar) != Permission.CommonCalendar))
             {
                 await botClient.SendTextMessageAsync(user.ChatId, MessageConst.NotEnoughPermissions);
                 LogHandler.LogDebug("NotEnoughPermissions", user);
