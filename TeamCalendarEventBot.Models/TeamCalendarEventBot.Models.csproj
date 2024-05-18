@@ -7,8 +7,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\TeamCalendarEventBot.Models\TeamCalendarEventBot.Models.csproj" />
-  </ItemGroup>
-
 </Project>

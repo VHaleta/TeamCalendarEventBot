@@ -8,5 +8,5 @@ namespace TeamCalendarEventBot.DataStorage
         List<CalendarEvent> GetGeneralEvents();
         void AddGeneralEvent(CalendarEvent calendarEvent);
         void DeleteGeneralEvent(CalendarEvent calendarEvent);
-        }
     }
+}
