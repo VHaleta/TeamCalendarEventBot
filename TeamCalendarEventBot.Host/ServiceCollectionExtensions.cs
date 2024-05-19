@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using TeamCalendarEventBot.DAL.Automapper;
 using TeamCalendarEventBot.DAL.Persistence;
 using TeamCalendarEventBot.DAL.Persistence.FileProvider;
 using TeamCalendarEventBot.DAL.Repositories;
@@ -29,10 +30,10 @@ namespace TeamCalendarEventBot.Host
         {
             // Add Services
             services.AddTransient<CalendarService>();
-            services.AddTransient<EventService>();
             services.AddTransient<MenuService>();
-            services.AddTransient<UserService>();
 
+            services.AddSingleton<EventService>();
+            services.AddSingleton<UserService>();
             services.AddSingleton<NotificationService>();
 
             // Add Handlers
@@ -42,6 +43,14 @@ namespace TeamCalendarEventBot.Host
 
             // Add Processor
             services.AddSingleton<BotProcessor>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddAutomapperConfiguration(this IServiceCollection services)
+        {
+            services.AddAutoMapper(typeof(UserMapperProfile));
+            services.AddAutoMapper(typeof(EventMapperProfile));
 
             return services;
         }

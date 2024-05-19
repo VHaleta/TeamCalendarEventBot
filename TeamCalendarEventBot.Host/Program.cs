@@ -34,6 +34,7 @@ namespace TeamCalendarEventBot.Host
                 using var servicesProvider = new ServiceCollection()
                     .AddDalDependencies()
                     .AddDomainDependencies()
+                    .AddAutomapperConfiguration()
                     .AddLogging(loggingBuilder =>
                     {
                         loggingBuilder.ClearProviders();
