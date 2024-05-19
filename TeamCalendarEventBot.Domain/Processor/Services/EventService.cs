@@ -5,7 +5,7 @@ using TeamCalendarEventBot.Models.Models;
 using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace TeamCalendarEventBot.Services
+namespace TeamCalendarEventBot.Domain.Processor.Services
 {
     public class EventService
     {

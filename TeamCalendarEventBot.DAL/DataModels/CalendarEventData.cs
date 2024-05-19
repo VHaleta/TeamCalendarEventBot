@@ -1,6 +1,4 @@
-﻿using TeamCalendarEventBot.Models.Constants;
-
-namespace TeamCalendarEventBot.DAL.DataModels
+﻿namespace TeamCalendarEventBot.DAL.DataModels
 {
     public class CalendarEventData
     {

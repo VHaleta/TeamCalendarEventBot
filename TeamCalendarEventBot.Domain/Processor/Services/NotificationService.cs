@@ -2,7 +2,6 @@
 using System.Timers;
 using TeamCalendarEventBot.Models.Constants;
 using TeamCalendarEventBot.Models.Models;
-using TeamCalendarEventBot.Services;
 using Telegram.Bot;
 
 namespace TeamCalendarEventBot.Domain.Processor.Services

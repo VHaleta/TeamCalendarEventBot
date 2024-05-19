@@ -2,7 +2,6 @@
 using TeamCalendarEventBot.Domain.Processor.Services;
 using TeamCalendarEventBot.Models.Constants;
 using TeamCalendarEventBot.Models.Models;
-using TeamCalendarEventBot.Services;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
