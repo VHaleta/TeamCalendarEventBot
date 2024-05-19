@@ -14,7 +14,7 @@ namespace TeamCalendarEventBot.Host
 {
     internal static class Program
     {
-        public static async Task Main()
+        static async Task Main()
         {
             Console.OutputEncoding = Encoding.UTF8;
             var bot = new TelegramBotClient(TelegramBotInfo.MainToken);
