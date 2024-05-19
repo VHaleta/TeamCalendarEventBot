@@ -14,7 +14,6 @@ namespace TeamCalendarEventBot
     public static class Program
     {
         private static TelegramBotClient Bot;
-        private static TelegramBotClient tempBot;
 
         public static async Task Main()
         {

@@ -1,5 +1,4 @@
-﻿using System;
-using TeamCalendarEventBot.Constants;
+﻿using TeamCalendarEventBot.Models.Constants;
 
 namespace TeamCalendarEventBot.Models.Models
 {

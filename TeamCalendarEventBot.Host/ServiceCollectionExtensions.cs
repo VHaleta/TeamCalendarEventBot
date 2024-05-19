@@ -2,6 +2,7 @@
 using TeamCalendarEventBot.DAL.Persistence;
 using TeamCalendarEventBot.DAL.Persistence.FileProvider;
 using TeamCalendarEventBot.DAL.Repositories;
+using TeamCalendarEventBot.Domain.Processor.Services;
 using TeamCalendarEventBot.Domain.Repositories;
 
 namespace TeamCalendarEventBot.Host
