@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using TeamCalendarEventBot.Domain.Listener;
 using TeamCalendarEventBot.Domain.Processor.Handlers;
 using TeamCalendarEventBot.Domain.Processor.Services;
 using Telegram.Bot;
@@ -10,24 +11,28 @@ namespace TeamCalendarEventBot.Domain.Processor
 {
     public class BotProcessor
     {
+        private static bool isAssigned = false;
         private readonly UserService _userHandler;
         private readonly ILogger<BotProcessor> _logger;
         private readonly MessageHandler _messageHandler;
         private readonly CallbackQueryHandler _callbackQueryHandler;
         private readonly UnknownUpdateHandler _unknownUpdateHandler;
+        private readonly IListener _listener;
 
         public BotProcessor(
             UserService userService,
             ILogger<BotProcessor> logger,
             MessageHandler messageHandler,
             CallbackQueryHandler callbackQueryHandler,
-            UnknownUpdateHandler unknownUpdateHandler)
+            UnknownUpdateHandler unknownUpdateHandler,
+            IListener publisher)
         {
             _userHandler = userService;
             _logger = logger;
             _messageHandler = messageHandler;
             _callbackQueryHandler = callbackQueryHandler;
             _unknownUpdateHandler = unknownUpdateHandler;
+            _listener = publisher;
         }
 
         public Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
@@ -44,6 +49,11 @@ namespace TeamCalendarEventBot.Domain.Processor
 
         public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
+            if (!isAssigned)
+            {
+                botClient.OnMakingApiRequest += _listener.OnApiRequest;
+                isAssigned = true;
+            }
             var user = _userHandler.GetUser(update);
             if (!user.Active)
             {

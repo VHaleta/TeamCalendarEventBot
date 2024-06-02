@@ -3,9 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NLog;
 using NLog.Extensions.Logging;
+using System.Reflection;
 using System.Text;
 using TeamCalendarEventBot.Domain.Processor;
-using TeamCalendarEventBot.Models.Constants;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
@@ -17,9 +17,11 @@ namespace TeamCalendarEventBot.Host
         static async Task Main()
         {
             Console.OutputEncoding = Encoding.UTF8;
-            var bot = new TelegramBotClient(TelegramBotInfo.MainToken);
-
-            var config = new ConfigurationBuilder().Build();
+            var config = new ConfigurationBuilder()
+                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                .AddJsonFile("appsettings.json")
+                .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
+                .Build();
 
             var logger = LogManager.Setup()
                                    .SetupExtensions(ext => ext.RegisterConfigSettings(config))
@@ -29,8 +31,6 @@ namespace TeamCalendarEventBot.Host
 
             try
             {
-                User me = await bot.GetMeAsync();
-
                 using var servicesProvider = new ServiceCollection()
                     .AddDalDependencies()
                     .AddDomainDependencies()
@@ -39,7 +39,13 @@ namespace TeamCalendarEventBot.Host
                     {
                         loggingBuilder.ClearProviders();
                         loggingBuilder.AddNLog(config);
-                    }).BuildServiceProvider();
+                    })
+                    .BuildServiceProvider();
+
+                string api = config["TelegramApiToken"];
+
+                var bot = new TelegramBotClient(api);
+                User me = await bot.GetMeAsync();
 
                 var botProcessor = servicesProvider.GetRequiredService<BotProcessor>();
 

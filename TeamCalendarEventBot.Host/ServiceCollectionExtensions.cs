@@ -3,10 +3,12 @@ using TeamCalendarEventBot.DAL.Automapper;
 using TeamCalendarEventBot.DAL.Persistence;
 using TeamCalendarEventBot.DAL.Persistence.FileProvider;
 using TeamCalendarEventBot.DAL.Repositories;
+using TeamCalendarEventBot.Domain.Listener;
 using TeamCalendarEventBot.Domain.Processor;
 using TeamCalendarEventBot.Domain.Processor.Handlers;
 using TeamCalendarEventBot.Domain.Processor.Services;
 using TeamCalendarEventBot.Domain.Repositories;
+using TeamCalendarEventBot.SqsConnection;
 
 namespace TeamCalendarEventBot.Host
 {
@@ -42,7 +44,11 @@ namespace TeamCalendarEventBot.Host
             services.AddSingleton<UnknownUpdateHandler>();
 
             // Add Processor
-            services.AddSingleton<BotProcessor>();
+            services.AddTransient<BotProcessor>();
+
+            // Add listener
+            services.AddTransient<IListener, Listener>();
+            services.AddSingleton<ISqsCommunication, SqsCommunication>();
 
             return services;
         }

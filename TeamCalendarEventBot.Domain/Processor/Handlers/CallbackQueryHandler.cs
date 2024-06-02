@@ -69,11 +69,13 @@ namespace TeamCalendarEventBot.Domain.Processor.Handlers
             DateTime date = new DateTime(year, month, 1);
             await botClient.EditMessageReplyMarkupAsync(chatId: user.ChatId, callbackQuery.Message.MessageId, replyMarkup: _calendarService.GetCalendarKeyboard(date, dataSplit[1]));
         }
+
         private async Task ShowCalendarEventsByDateCallbackQueryAsync(ITelegramBotClient botClient, UserBot user, string[] dataSplit)
         {
             var date = dataSplit[1].CustomDateParse();
             await _eventService.ShowCalendarEventsByDateAsync(botClient, date, user);
         }
+
         private async Task InfoMessageAsync(ITelegramBotClient botClient, UserBot user)
         {
             await botClient.SendTextMessageAsync(user.ChatId, MessageConst.InfoAboutBot);

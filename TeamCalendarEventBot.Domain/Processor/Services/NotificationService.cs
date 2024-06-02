@@ -13,6 +13,7 @@ namespace TeamCalendarEventBot.Domain.Processor.Services
         private readonly EventService _eventService;
         private readonly UserService _userService;
         private System.Timers.Timer aTimer;
+
         public NotificationService(
             ILogger<NotificationService> logger,
             EventService eventService,
@@ -25,6 +26,7 @@ namespace TeamCalendarEventBot.Domain.Processor.Services
             aTimer = new System.Timers.Timer(600000);
             aTimer.Elapsed += CheckNotifications;
         }
+
         private async void CheckNotifications(Object source, ElapsedEventArgs e)
         {
             _logger.LogDebug("Notification check");
