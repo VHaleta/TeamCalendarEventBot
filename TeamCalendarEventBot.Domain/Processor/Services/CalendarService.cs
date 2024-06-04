@@ -4,11 +4,11 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace TeamCalendarEventBot.Domain.Processor.Services
 {
-    public class CalendarService
+    public class CalendarService : ICalendarService
     {
-        private readonly EventService _eventService;
+        private readonly IEventService _eventService;
 
-        public CalendarService(EventService eventService)
+        public CalendarService(IEventService eventService)
         {
             _eventService = eventService;
         }

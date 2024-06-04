@@ -12,7 +12,7 @@ namespace TeamCalendarEventBot.Domain.Processor
     public class BotProcessor
     {
         private static bool isAssigned = false;
-        private readonly UserService _userHandler;
+        private readonly IUserService _userService;
         private readonly ILogger<BotProcessor> _logger;
         private readonly MessageHandler _messageHandler;
         private readonly CallbackQueryHandler _callbackQueryHandler;
@@ -20,19 +20,19 @@ namespace TeamCalendarEventBot.Domain.Processor
         private readonly IListener _listener;
 
         public BotProcessor(
-            UserService userService,
+            IUserService userService,
             ILogger<BotProcessor> logger,
             MessageHandler messageHandler,
             CallbackQueryHandler callbackQueryHandler,
             UnknownUpdateHandler unknownUpdateHandler,
-            IListener publisher)
+            IListener listener)
         {
-            _userHandler = userService;
+            _userService = userService;
             _logger = logger;
             _messageHandler = messageHandler;
             _callbackQueryHandler = callbackQueryHandler;
             _unknownUpdateHandler = unknownUpdateHandler;
-            _listener = publisher;
+            _listener = listener;
         }
 
         public Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
@@ -54,13 +54,13 @@ namespace TeamCalendarEventBot.Domain.Processor
                 botClient.OnMakingApiRequest += _listener.OnApiRequest;
                 isAssigned = true;
             }
-            var user = _userHandler.GetUser(update);
+            var user = _userService.GetUser(update);
             if (!user.Active)
             {
                 _logger.LogDebug($"User is unactive", user);
                 return;
             }
-            if (!_userHandler.IsUserAuthorizedAsync(botClient, update.Message, user).Result)
+            if (!_userService.IsUserAuthorizedAsync(botClient, update.Message, user).Result)
             {
                 _logger.LogDebug($"User isn`t authorized", user);
                 return;

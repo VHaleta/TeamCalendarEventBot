@@ -4,7 +4,7 @@ namespace SqsProducer.Shared
 {
     public static class MessageTypeConstants
     {
-        public const string MessageTypeKey = "MESSAGE_CONTEXT";
+        public const string MessageContext = "MESSAGE_CONTEXT";
         public const string MessageCreatedDateTimeOffsetKey = "MESSAGE_SENDDATETIME";
     }
 
@@ -31,7 +31,7 @@ namespace SqsProducer.Shared
             return new Dictionary<string, MessageAttributeValue>
                 {
                     {
-                       MessageTypeConstants.MessageTypeKey,
+                       MessageTypeConstants.MessageContext,
                        new MessageAttributeValue()
                        {
                            DataType = MessageDataType,

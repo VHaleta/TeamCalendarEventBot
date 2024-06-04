@@ -31,12 +31,12 @@ namespace TeamCalendarEventBot.Host
         public static IServiceCollection AddDomainDependencies(this IServiceCollection services)
         {
             // Add Services
-            services.AddTransient<CalendarService>();
-            services.AddTransient<MenuService>();
+            services.AddTransient<ICalendarService, CalendarService>();
+            services.AddTransient<IMenuService, MenuService>();
 
-            services.AddSingleton<EventService>();
-            services.AddSingleton<UserService>();
-            services.AddSingleton<NotificationService>();
+            services.AddSingleton<IEventService, EventService>();
+            services.AddSingleton<IUserService, UserService>();
+            services.AddSingleton<INotificationService, NotificationService>();
 
             // Add Handlers
             services.AddSingleton<MessageHandler>();

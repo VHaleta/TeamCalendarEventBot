@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,10 +12,19 @@ namespace TeamCalendarEventBot.SqsConnection
     public class SqsCommunication : ISqsCommunication
     {
         private SqsMessageProducer messageProducer;
+        private ILogger<SqsCommunication> _logger;
 
-        public SqsCommunication()
+        public SqsCommunication(ILogger<SqsCommunication> logger)
         {
-            messageProducer = new SqsMessageProducer();
+            _logger = logger;
+            try
+            {
+                messageProducer = new SqsMessageProducer();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+            }
         }
 
         public async Task Send(string context, DateTimeOffset date, string message)

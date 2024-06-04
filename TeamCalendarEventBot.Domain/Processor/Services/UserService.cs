@@ -9,15 +9,15 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace TeamCalendarEventBot.Domain.Processor.Services
 {
-    public class UserService
+    public class UserService : IUserService
     {
         private readonly IUserBotRepository _userRepository;
         private readonly ILogger<UserService> _logger;
-        private readonly MenuService _menuService;
+        private readonly IMenuService _menuService;
         private readonly object _locker = new();
         private readonly List<UserBot> _allUsers;
 
-        public UserService(IUserBotRepository userBotRepository, ILogger<UserService> logger, MenuService menuService)
+        public UserService(IUserBotRepository userBotRepository, ILogger<UserService> logger, IMenuService menuService)
         {
             _userRepository = userBotRepository;
             _logger = logger;

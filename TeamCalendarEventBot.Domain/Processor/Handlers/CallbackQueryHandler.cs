@@ -11,16 +11,16 @@ namespace TeamCalendarEventBot.Domain.Processor.Handlers
 {
     public class CallbackQueryHandler
     {
-        private readonly UserService _userService;
-        private readonly CalendarService _calendarService;
-        private readonly EventService _eventService;
+        private readonly IUserService _userService;
+        private readonly ICalendarService _calendarService;
+        private readonly IEventService _eventService;
         private readonly ILogger<CallbackQueryHandler> _logger;
 
         public CallbackQueryHandler(
-            UserService userService,
+            IUserService userService,
             ILogger<CallbackQueryHandler> logger,
-            CalendarService calendarService,
-            EventService eventService)
+            ICalendarService calendarService,
+            IEventService eventService)
         {
             _userService = userService;
             _logger = logger;

@@ -11,20 +11,20 @@ namespace TeamCalendarEventBot.Domain.Processor.Handlers
 {
     public class MessageHandler
     {
-        private readonly UserService _userService;
-        private readonly CalendarService _calendarService;
-        private readonly MenuService _menuService;
-        private readonly EventService _eventService;
-        private readonly NotificationService _notificationService;
+        private readonly IUserService _userService;
+        private readonly ICalendarService _calendarService;
+        private readonly IMenuService _menuService;
+        private readonly IEventService _eventService;
+        private readonly INotificationService _notificationService;
         private readonly ILogger<MessageHandler> _logger;
 
         public MessageHandler(
-            UserService userService,
+            IUserService userService,
             ILogger<MessageHandler> logger,
-            CalendarService calendarService,
-            MenuService menuService,
-            EventService eventService,
-            NotificationService notificationService)
+            ICalendarService calendarService,
+            IMenuService menuService,
+            IEventService eventService,
+            INotificationService notificationService)
         {
             _userService = userService;
             _logger = logger;

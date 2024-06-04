@@ -6,12 +6,10 @@ namespace TeamCalendarEventBot.Domain.Listener
 {
     public class Listener : IListener
     {
-        private readonly ILogger<Listener> _logger;
         private readonly ISqsCommunication _sqsCommunication;
 
         public Listener(ILogger<Listener> logger, ISqsCommunication sqsCommunication)
         {
-            _logger = logger;
             _sqsCommunication = sqsCommunication;
         }
 

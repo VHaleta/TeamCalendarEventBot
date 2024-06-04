@@ -7,7 +7,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace TeamCalendarEventBot.Domain.Processor.Services
 {
-    public class EventService
+    public class EventService : IEventService
     {
         private readonly IEventRepository _eventRepository;
         private readonly List<CalendarEvent> _allGeneralEvents;

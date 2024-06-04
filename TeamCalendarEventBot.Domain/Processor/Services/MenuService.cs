@@ -3,7 +3,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace TeamCalendarEventBot.Domain.Processor.Services
 {
-    public class MenuService
+    public class MenuService : IMenuService
     {
         public ReplyKeyboardMarkup GetMenuButtons(Permission permission, MenuStage menuStage)
         {

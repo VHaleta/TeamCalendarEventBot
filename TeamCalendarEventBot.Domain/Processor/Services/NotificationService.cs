@@ -6,18 +6,18 @@ using Telegram.Bot;
 
 namespace TeamCalendarEventBot.Domain.Processor.Services
 {
-    public class NotificationService
+    public class NotificationService : INotificationService
     {
         private ITelegramBotClient bot;
         private readonly ILogger<NotificationService> _logger;
-        private readonly EventService _eventService;
-        private readonly UserService _userService;
+        private readonly IEventService _eventService;
+        private readonly IUserService _userService;
         private System.Timers.Timer aTimer;
 
         public NotificationService(
             ILogger<NotificationService> logger,
-            EventService eventService,
-            UserService userService)
+            IEventService eventService,
+            IUserService userService)
         {
             _logger = logger;
             _eventService = eventService;
