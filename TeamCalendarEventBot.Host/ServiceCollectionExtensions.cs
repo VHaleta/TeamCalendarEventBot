@@ -39,9 +39,9 @@ namespace TeamCalendarEventBot.Host
             services.AddSingleton<INotificationService, NotificationService>();
 
             // Add Handlers
-            services.AddSingleton<MessageHandler>();
-            services.AddSingleton<CallbackQueryHandler>();
-            services.AddSingleton<UnknownUpdateHandler>();
+            services.AddSingleton<IMessageHandler, MessageHandler>();
+            services.AddSingleton<ICallbackQueryHandler, CallbackQueryHandler>();
+            services.AddSingleton<IUnknownUpdateHandler, UnknownUpdateHandler>();
 
             // Add Processor
             services.AddTransient<BotProcessor>();

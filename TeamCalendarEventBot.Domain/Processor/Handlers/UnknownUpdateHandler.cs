@@ -3,7 +3,7 @@ using Telegram.Bot.Types;
 
 namespace TeamCalendarEventBot.Domain.Processor.Handlers
 {
-    public class UnknownUpdateHandler
+    public class UnknownUpdateHandler : IUnknownUpdateHandler
     {
         public Task UnknownUpdateHandlerAsync(ITelegramBotClient botClient, Update update)
         {

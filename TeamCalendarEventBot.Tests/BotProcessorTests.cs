@@ -1,28 +1,27 @@
 using AutoFixture;
-using FluentAssertions;
 using NSubstitute;
+using NSubstitute.ReceivedExtensions;
 using TeamCalendarEventBot.Domain.Processor;
 using TeamCalendarEventBot.Domain.Processor.Handlers;
 using TeamCalendarEventBot.Domain.Processor.Services;
 using TeamCalendarEventBot.Models.Models;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
 using Xunit;
 
 namespace TeamCalendarEventBot.Tests
 {
-    public class BotProcessorTests : IClassFixture<BotProcessorFixture>
+    public class BotProcessorTests : IClassFixture<BotProcessorFixture>, IClassFixture<LoggerFixture<BotProcessor>>
     {
         private readonly BotProcessor botProcessor;
-        private readonly MessageHandler messageHandlerSubstitute;
-        private readonly CallbackQueryHandler callbackQueryHandlerSubstitute;
-        private readonly UnknownUpdateHandler unknownUpdateHandlerSubstitute;
+        private readonly IMessageHandler messageHandlerSubstitute;
+        private readonly ICallbackQueryHandler callbackQueryHandlerSubstitute;
+        private readonly IUnknownUpdateHandler unknownUpdateHandlerSubstitute;
         private readonly IUserService userServiceSubstitute;
         private readonly ITelegramBotClient telegramBotClient;
         private readonly Fixture fixture;
 
-        public BotProcessorTests(BotProcessorFixture botProcessorFixture)
+        public BotProcessorTests(BotProcessorFixture botProcessorFixture, LoggerFixture<BotProcessor> loggerFixture)
         {
             messageHandlerSubstitute = botProcessorFixture.MessageHandler;
             callbackQueryHandlerSubstitute = botProcessorFixture.CallbackQueryHandler;
@@ -32,7 +31,7 @@ namespace TeamCalendarEventBot.Tests
 
             botProcessor = new BotProcessor(
                 botProcessorFixture.UserService,
-                botProcessorFixture.Logger,
+                loggerFixture.Logger,
                 botProcessorFixture.MessageHandler,
                 botProcessorFixture.CallbackQueryHandler,
                 botProcessorFixture.UnknownUpdateHandler,
@@ -45,8 +44,7 @@ namespace TeamCalendarEventBot.Tests
         public async void HandleUpdateAsync_WithUnknownUpdateType_CallsUnknownUpdateHandler()
         {
             // Arrange
-            var update = Substitute.For<Update>();
-            update.Type.Returns(UpdateType.Unknown);
+            var update = new Update();
 
             var user = fixture.Create<UserBot>();
             userServiceSubstitute.GetUser(new Update()).ReturnsForAnyArgs(user);
@@ -57,8 +55,49 @@ namespace TeamCalendarEventBot.Tests
             await botProcessor.HandleUpdateAsync(telegramBotClient, update, CancellationToken.None);
 
             //Assert
-            var receivedCalls = unknownUpdateHandlerSubstitute.UnknownUpdateHandlerAsync(telegramBotClient, update).ReceivedCalls();
-            receivedCalls.Should().HaveCount(1);
+            unknownUpdateHandlerSubstitute.Received(1);
+        }
+
+        [Fact]
+        public async void HandleUpdateAsync_WithCallbackQueryUpdateType_CallsCallbackQueryHandler()
+        {
+            // Arrange
+            var update = new Update()
+            {
+                CallbackQuery = new CallbackQuery()
+            };
+
+            var user = fixture.Create<UserBot>();
+            userServiceSubstitute.GetUser(new Update()).ReturnsForAnyArgs(user);
+            userServiceSubstitute.IsUserAuthorizedAsync(telegramBotClient, new Message(), user).ReturnsForAnyArgs(true);
+
+
+            //Act
+            await botProcessor.HandleUpdateAsync(telegramBotClient, update, CancellationToken.None);
+
+            //Assert
+            callbackQueryHandlerSubstitute.Received(1);
+        }
+
+        [Fact]
+        public async void HandleUpdateAsync_WithMessageUpdateType_CallsMessageHandler()
+        {
+            // Arrange
+            var update = new Update()
+            {
+                Message = new Message()
+            };
+
+            var user = fixture.Create<UserBot>();
+            userServiceSubstitute.GetUser(new Update()).ReturnsForAnyArgs(user);
+            userServiceSubstitute.IsUserAuthorizedAsync(telegramBotClient, new Message(), user).ReturnsForAnyArgs(true);
+
+
+            //Act
+            await botProcessor.HandleUpdateAsync(telegramBotClient, update, CancellationToken.None);
+
+            //Assert
+            messageHandlerSubstitute.Received(1);
         }
     }
 }

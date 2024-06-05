@@ -14,17 +14,17 @@ namespace TeamCalendarEventBot.Domain.Processor
         private static bool isAssigned = false;
         private readonly IUserService _userService;
         private readonly ILogger<BotProcessor> _logger;
-        private readonly MessageHandler _messageHandler;
-        private readonly CallbackQueryHandler _callbackQueryHandler;
-        private readonly UnknownUpdateHandler _unknownUpdateHandler;
+        private readonly IMessageHandler _messageHandler;
+        private readonly ICallbackQueryHandler _callbackQueryHandler;
+        private readonly IUnknownUpdateHandler _unknownUpdateHandler;
         private readonly IListener _listener;
 
         public BotProcessor(
             IUserService userService,
             ILogger<BotProcessor> logger,
-            MessageHandler messageHandler,
-            CallbackQueryHandler callbackQueryHandler,
-            UnknownUpdateHandler unknownUpdateHandler,
+            IMessageHandler messageHandler,
+            ICallbackQueryHandler callbackQueryHandler,
+            IUnknownUpdateHandler unknownUpdateHandler,
             IListener listener)
         {
             _userService = userService;

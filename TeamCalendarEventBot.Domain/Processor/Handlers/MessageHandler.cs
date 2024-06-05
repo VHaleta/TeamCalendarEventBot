@@ -9,7 +9,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace TeamCalendarEventBot.Domain.Processor.Handlers
 {
-    public class MessageHandler
+    public class MessageHandler : IMessageHandler
     {
         private readonly IUserService _userService;
         private readonly ICalendarService _calendarService;
