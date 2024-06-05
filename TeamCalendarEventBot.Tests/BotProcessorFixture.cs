@@ -1,7 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
-using NSubstitute;
+﻿using NSubstitute;
 using TeamCalendarEventBot.Domain.Listener;
-using TeamCalendarEventBot.Domain.Processor;
 using TeamCalendarEventBot.Domain.Processor.Handlers;
 using TeamCalendarEventBot.Domain.Processor.Services;
 using Telegram.Bot;
